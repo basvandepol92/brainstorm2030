@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#080808">
+  <title>Regio Zuid · Brainstorm 2030</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #080808;
+      --bg2:       #111111;
+      --bg3:       #1A1A1A;
+      --yellow:    #F7C948;
+      --ydim:      rgba(247,201,72,0.10);
+      --yborder:   rgba(247,201,72,0.22);
+      --red:       #FF453A;
+      --rdim:      rgba(255,69,58,0.10);
+      --rborder:   rgba(255,69,58,0.22);
+      --blue:      #2F9EFF;
+      --bdim:      rgba(47,158,255,0.10);
+      --bborder:   rgba(47,158,255,0.22);
+      --text:      #FFFFFF;
+      --dim:       #888888;
+      --muted:     #3A3A3A;
+      --border:    #1E1E1E;
+      --radius:    16px;
+      --nav:       72px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    html, body {
+      height: 100%; overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── PICKER ───────────────────────────────────────── */
+    #picker {
+      position: fixed; inset: 0; z-index: 200;
+      background: var(--bg);
+      display: flex; flex-direction: column; align-items: center;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 56px 24px 48px;
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    #picker.out { opacity: 0; transform: translateY(-24px); pointer-events: none; }
+
+    .p-badge {
+      width: 76px; height: 76px; border-radius: 22px;
+      background: var(--yellow);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 900; color: #000;
+      margin-bottom: 22px;
+      box-shadow: 0 0 60px rgba(247,201,72,.35), 0 0 120px rgba(247,201,72,.12);
+    }
+    .p-title { font-size: 30px; font-weight: 900; text-align: center; line-height: 1.15; margin-bottom: 4px; }
+    .p-year  { font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--yellow); margin-bottom: 40px; }
+    .p-hint  { font-size: 11px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: var(--dim); margin-bottom: 14px; }
+
+    .name-list { width: 100%; max-width: 390px; display: flex; flex-direction: column; gap: 8px; }
+    .name-btn {
+      width: 100%; padding: 15px 18px;
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 14px;
+      color: var(--text); font-family: inherit; font-size: 15px; font-weight: 600;
+      text-align: left; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background .12s, border-color .12s, transform .1s;
+    }
+    .name-btn:active { background: var(--ydim); border-color: var(--yborder); transform: scale(.97); }
+    .name-arr { color: var(--muted); font-size: 18px; }
+
+    /* ── MAIN APP ─────────────────────────────────────── */
+    #app {
+      height: 100%; display: flex; flex-direction: column;
+      opacity: 0; transition: opacity .4s ease;
+    }
+    #app.show { opacity: 1; }
+
+    /* Header */
+    .hdr {
+      height: 56px; background: var(--bg); flex-shrink: 0;
+      display: flex; align-items: center; padding: 0 18px;
+      justify-content: space-between; position: relative; z-index: 10;
+      border-bottom: 1px solid var(--border);
+    }
+    .hdr::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--yellow) 40%, var(--yellow) 60%, transparent 100%);
+      opacity: .3;
+    }
+    .hdr-brand { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--yellow); }
+    .hdr-user {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 20px;
+      padding: 5px 12px 5px 6px; cursor: pointer; transition: border-color .15s;
+    }
+    .hdr-user:active { border-color: var(--yborder); }
+    .hdr-av {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--yellow); display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 900; color: #000;
+    }
+    .hdr-name { font-size: 13px; font-weight: 600; }
+
+    /* Content */
+    .content { flex: 1; overflow: hidden; position: relative; }
+    .pane {
+      position: absolute; inset: 0; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 22px 18px calc(var(--nav) + 24px);
+      display: none;
+    }
+    .pane.on { display: block; }
+
+    /* Bottom nav */
+    .nav {
+      height: var(--nav); flex-shrink: 0;
+      background: #1A1A1A;
+      border-top: 1px solid #333;
+      display: flex; align-items: stretch;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .nb {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 5px;
+      background: none; border: none; cursor: pointer;
+      color: #777; padding: 6px 4px;
+      font-family: inherit; transition: color .15s;
+    }
+    .nb.on { color: var(--yellow); }
+    .nb svg { width: 22px; height: 22px; }
+    .nb span { font-size: 10px; font-weight: 700; letter-spacing: .03em; }
+
+    /* ── SHARED COMPONENTS ────────────────────────────── */
+    .ph { margin-bottom: 24px; }
+    .ph-tag { font-size: 11px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: var(--yellow); margin-bottom: 5px; }
+    .ph-title { font-size: 25px; font-weight: 900; line-height: 1.2; }
+    .ph-sub { font-size: 13px; color: var(--dim); margin-top: 5px; line-height: 1.5; }
+
+    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
+    .card-lbl { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; }
+
+    .sec-lbl { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--dim); margin: 20px 0 10px; }
+
+    .timebar {
+      background: var(--ydim); border: 1px solid var(--yborder); border-radius: 12px;
+      padding: 13px 16px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .timebar-icon { font-size: 22px; }
+    .timebar-main { font-size: 16px; font-weight: 700; color: var(--yellow); }
+    .timebar-sub { font-size: 12px; color: var(--dim); margin-top: 2px; }
+
+    .gcard {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px 16px 16px 22px; margin-bottom: 14px; position: relative; overflow: hidden;
+    }
+    .gcard::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--yellow); border-radius: 4px 0 0 4px; }
+    .gcard-lbl { font-size: 11px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: var(--dim); margin-bottom: 3px; }
+    .gcard-val { font-size: 28px; font-weight: 900; color: var(--yellow); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .chip {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 20px;
+      padding: 5px 12px; font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .chip.me { background: var(--ydim); border-color: var(--yborder); color: var(--yellow); font-weight: 700; }
+    .rdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .rdot.superheld { background: var(--yellow); }
+    .rdot.villain   { background: var(--red); }
+    .rdot.sidekick  { background: var(--blue); }
+
+    /* Collapsible Q sections */
+    .qs { margin-bottom: 10px; }
+    .qs-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 13px; cursor: pointer; transition: border-color .15s;
+      user-select: none;
+    }
+    .qs-head.open { border-color: var(--yborder); border-radius: 13px 13px 0 0; }
+    .qs-ttl { font-size: 14px; font-weight: 700; }
+    .qs-chev { font-size: 18px; color: var(--dim); transition: transform .22s; display: inline-block; }
+    .qs-head.open .qs-chev { transform: rotate(180deg); }
+    .qs-body {
+      background: var(--bg2); border: 1px solid var(--yborder); border-top: none;
+      border-radius: 0 0 13px 13px;
+      overflow: hidden; max-height: 0;
+      transition: max-height .3s ease, padding .3s ease;
+    }
+    .qs-body.open { max-height: 1000px; padding: 14px 16px; }
+
+    .qlist { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .qlist li { display: flex; gap: 11px; align-items: flex-start; font-size: 14px; line-height: 1.55; color: #CCCCCC; }
+    .qn {
+      min-width: 22px; height: 22px; border-radius: 6px;
+      background: var(--ydim); border: 1px solid var(--yborder);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: var(--yellow); flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── HOME ─────────────────────────────────────────── */
+    .welcome { margin-bottom: 28px; }
+    .w-greet { font-size: 13px; color: var(--dim); font-weight: 500; margin-bottom: 3px; }
+    .w-name  { font-size: 30px; font-weight: 900; }
+    .w-name em { color: var(--yellow); font-style: normal; }
+
+    .ov-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px 16px; display: flex; align-items: center; gap: 13px;
+      cursor: pointer; margin-bottom: 9px; transition: background .12s, transform .1s;
+    }
+    .ov-card:active { background: var(--bg3); transform: scale(.98); }
+    .ov-num {
+      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      background: var(--ydim); border: 1px solid var(--yborder);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: var(--yellow);
+    }
+    .ov-info { flex: 1; }
+    .ov-fase  { font-size: 11px; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+    .ov-grp   { font-size: 16px; font-weight: 700; margin-top: 2px; }
+    .ov-arr   { color: var(--muted); font-size: 20px; }
+    .rbadge   { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .rbadge.superheld { background: var(--ydim); border: 1px solid var(--yborder); color: var(--yellow); }
+    .rbadge.villain   { background: var(--rdim); border: 1px solid var(--rborder); color: var(--red); }
+    .rbadge.sidekick  { background: var(--bdim); border: 1px solid var(--bborder); color: var(--blue); }
+
+    /* ── SPELREGELS ───────────────────────────────────── */
+    .rule { display: flex; gap: 13px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--border); }
+    .rule:last-child { border-bottom: none; }
+    .rule-n {
+      width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+      background: var(--yellow); display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 900; color: #000;
+    }
+    .rule-t { font-size: 14px; font-weight: 500; line-height: 1.6; padding-top: 3px; color: #DDDDDD; }
+
+    /* ── FASE 2 ROLE CARD ─────────────────────────────── */
+    .rcard {
+      border-radius: 20px; padding: 24px 22px; margin-bottom: 14px;
+      position: relative; overflow: hidden;
+    }
+    .rcard.superheld { background: linear-gradient(145deg,#1C1500 0%,#252000 100%); border: 1px solid rgba(247,201,72,.28); }
+    .rcard.villain   { background: linear-gradient(145deg,#1C0400 0%,#220900 100%); border: 1px solid rgba(255,69,58,.28); }
+    .rcard.sidekick  { background: linear-gradient(145deg,#001422 0%,#001825 100%); border: 1px solid rgba(47,158,255,.28); }
+    .rcard-glow {
+      position: absolute; top: -50px; right: -50px;
+      width: 200px; height: 200px; border-radius: 50%; opacity: .12; pointer-events: none;
+    }
+    .rcard.superheld .rcard-glow { background: var(--yellow); }
+    .rcard.villain   .rcard-glow { background: var(--red); }
+    .rcard.sidekick  .rcard-glow { background: var(--blue); }
+    .rcard-tag  { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 4px; }
+    .rcard.superheld .rcard-tag { color: var(--yellow); }
+    .rcard.villain   .rcard-tag { color: var(--red); }
+    .rcard.sidekick  .rcard-tag { color: var(--blue); }
+    .rcard-name { font-size: 38px; font-weight: 900; margin-bottom: 20px; line-height: 1; }
+    .rcard.superheld .rcard-name { color: var(--yellow); }
+    .rcard.villain   .rcard-name { color: var(--red); }
+    .rcard.sidekick  .rcard-name { color: var(--blue); }
+    .rcard-illo { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+    .rcard-desc { font-size: 14px; line-height: 1.65; color: #BBBBBB; }
+
+    /* role question card accent */
+    .rqcard.superheld { border-left: 3px solid var(--yellow); }
+    .rqcard.villain   { border-left: 3px solid var(--red); }
+    .rqcard.sidekick  { border-left: 3px solid var(--blue); }
+    .rqcard .qn.villain   { background: var(--rdim); border-color: var(--rborder); color: var(--red); }
+    .rqcard .qn.sidekick  { background: var(--bdim); border-color: var(--bborder); color: var(--blue); }
+
+    /* divider */
+    .div { height: 1px; background: var(--border); margin: 18px 0; }
+
+
+    /* body text */
+    .body-text { font-size: 14px; line-height: 1.7; color: #BBBBBB; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ PICKER ══ -->
+<div id="picker">
+  <div class="p-badge">RZ</div>
+  <h1 class="p-title">Regio Zuid<br>Brainstorm</h1>
+  <p class="p-year">2030</p>
+  <p class="p-hint">Kies je naam</p>
+  <div class="name-list" id="name-list"></div>
+</div>
+
+<!-- ═══════════════════════════════════ APP ══════ -->
+<div id="app">
+
+  <header class="hdr">
+    <div class="hdr-brand">RZ · Brainstorm 2030</div>
+    <div class="hdr-user" onclick="resetUser()" title="Naam wijzigen">
+      <div class="hdr-av" id="hdr-av">?</div>
+      <span class="hdr-name" id="hdr-name">—</span>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="pane on" id="p-home">
+      <div class="welcome">
+        <div class="w-greet">Welkom bij de brainstorm 👋</div>
+        <div class="w-name">Hey, <em id="w-name">—</em></div>
+      </div>
+      <div class="sec-lbl" style="margin-top:0">Jouw indeling per fase</div>
+      <div id="ov-f1" class="ov-card" onclick="showTab('fase1')">
+        <div class="ov-num">1</div>
+        <div class="ov-info">
+          <div class="ov-fase">Fase 1 · Dromen</div>
+          <div class="ov-grp" id="ov-g1">—</div>
+        </div>
+        <div class="ov-arr">›</div>
+      </div>
+      <div id="ov-f2" class="ov-card" onclick="showTab('fase2')">
+        <div class="ov-num">2</div>
+        <div class="ov-info">
+          <div class="ov-fase">Fase 2 · Toetsen</div>
+          <div class="ov-grp" id="ov-g2">—</div>
+        </div>
+        <div class="rbadge" id="ov-rbadge">—</div>
+      </div>
+      <div id="ov-f3" class="ov-card" onclick="showTab('fase3')">
+        <div class="ov-num">3</div>
+        <div class="ov-info">
+          <div class="ov-fase">Fase 3 · Acties</div>
+          <div class="ov-grp" id="ov-g3">—</div>
+        </div>
+        <div class="ov-arr">›</div>
+      </div>
+    </div>
+
+    <!-- SPELREGELS -->
+    <div class="pane" id="p-spelregels">
+      <div class="ph">
+        <div class="ph-tag">Goed om te weten</div>
+        <div class="ph-title">Spelregels</div>
+      </div>
+      <div class="card">
+        <div class="rule"><div class="rule-n">1</div><div class="rule-t">Elk idee is welkom — oordeel pas later. Kwantiteit boven kwaliteit in de divergerende fase.</div></div>
+        <div class="rule"><div class="rule-n">2</div><div class="rule-t">Bouw voort op ideeën van anderen. Zeg "ja, en…" in plaats van "ja, maar…"</div></div>
+        <div class="rule"><div class="rule-n">3</div><div class="rule-t">Eén gesprek tegelijk. Laat elkaar uitpraten — geen interrupties.</div></div>
+        <div class="rule"><div class="rule-n">4</div><div class="rule-t">Iedereen draagt bij. Geen vrije passagiers — elke stem telt.</div></div>
+        <div class="rule"><div class="rule-n">5</div><div class="rule-t">Houd de energie hoog. Sta op, beweeg, wees enthousiast.</div></div>
+        <div class="rule"><div class="rule-n">6</div><div class="rule-t">Telefoon in de zak — behalve voor deze app 😉</div></div>
+        <div class="rule"><div class="rule-n">7</div><div class="rule-t">Respect voor ieders perspectief. Er zijn geen foute antwoorden.</div></div>
+        <div class="rule"><div class="rule-n">8</div><div class="rule-t">Houd de tijd in de gaten: 30 min brainstorm per fase, daarna 10 min plenair terugkoppelen.</div></div>
+      </div>
+    </div>
+
+    <!-- FASE 1 -->
+    <div class="pane" id="p-fase1">
+      <div class="ph">
+        <div class="ph-tag">Fase 1</div>
+        <div class="ph-title">Samen dromen over Regio Zuid in 2030</div>
+        <div class="ph-sub">Verken samen de meest ambitieuze toekomst</div>
+      </div>
+      <div class="timebar">
+        <div class="timebar-icon">⏱</div>
+        <div>
+          <div class="timebar-main">30 min brainstorm</div>
+          <div class="timebar-sub">+ 10 min plenair terugkoppelen</div>
+        </div>
+      </div>
+      <div class="gcard">
+        <div class="gcard-lbl">Jouw groep</div>
+        <div class="gcard-val" id="f1-grp">—</div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">In jouw groep</div>
+        <div class="chips" id="f1-people">—</div>
+      </div>
+      <div class="div"></div>
+      <div class="sec-lbl">Wat wordt er van je gevraagd?</div>
+      <div class="card" style="margin-bottom:18px">
+        <p class="body-text">Droom samen over hoe Regio Zuid eruitziet in 2030. Denk groot, denk ambitieus. Gebruik de begeleidende vragen hieronder als inspiratie — er zijn geen foute antwoorden. Schrijf de mooiste dromen op.</p>
+      </div>
+      <div class="sec-lbl">Begeleidende vragen per thema</div>
+
+      <div class="qs">
+        <div class="qs-head" onclick="toggleQ(this)">
+          <span class="qs-ttl">👥 Klant</span><span class="qs-chev">⌄</span>
+        </div>
+        <div class="qs-body">
+          <ul class="qlist">
+            <li><div class="qn">1</div>Wat zeggen onze beste klanten in 2030 over Regio Zuid?</li>
+            <li><div class="qn">2</div>Waarom kiezen klanten dan bewust voor ons?</li>
+            <li><div class="qn">3</div>Waarin zijn we dan méér dan een detacheerder?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qs">
+        <div class="qs-head" onclick="toggleQ(this)">
+          <span class="qs-ttl">⭐ Rockstar</span><span class="qs-chev">⌄</span>
+        </div>
+        <div class="qs-body">
+          <ul class="qlist">
+            <li><div class="qn">1</div>Waarom willen Rockstars in 2030 bij Regio Zuid horen?</li>
+            <li><div class="qn">2</div>Wat ervaren zij hier wat ze elders niet ervaren?</li>
+            <li><div class="qn">3</div>Hoe ziet ontwikkeling, community en werkgeluk er dan uit?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qs">
+        <div class="qs-head" onclick="toggleQ(this)">
+          <span class="qs-ttl">🤝 Samenwerking in de regio</span><span class="qs-chev">⌄</span>
+        </div>
+        <div class="qs-body">
+          <ul class="qlist">
+            <li><div class="qn">1</div>Hoe werken Sales, TM, Recruitment, P&amp;C en MD dan samen?</li>
+            <li><div class="qn">2</div>Wat loopt dan vanzelf wat nu nog energie kost?</li>
+            <li><div class="qn">3</div>Waar zijn we als regio uitzonderlijk goed in geworden?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qs">
+        <div class="qs-head" onclick="toggleQ(this)">
+          <span class="qs-ttl">🚀 Dienstverlening</span><span class="qs-chev">⌄</span>
+        </div>
+        <div class="qs-body">
+          <ul class="qlist">
+            <li><div class="qn">1</div>Welke diensten leveren we dan die we nu nog beperkt of niet leveren?</li>
+            <li><div class="qn">2</div>Welke rol spelen consultancy, projecten, AI of nieuwe proposities?</li>
+            <li><div class="qn">3</div>Waar staan we in de markt om bekend?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qs">
+        <div class="qs-head" onclick="toggleQ(this)">
+          <span class="qs-ttl">⚙️ Organisatie &amp; Operatie</span><span class="qs-chev">⌄</span>
+        </div>
+        <div class="qs-body">
+          <ul class="qlist">
+            <li><div class="qn">1</div>Wat hebben we slimmer, schaalbaarder of professioneler gemaakt?</li>
+            <li><div class="qn">2</div>Welke keuzes hebben we gemaakt waardoor we niet alles meer tegelijk doen?</li>
+            <li><div class="qn">3</div>Wat doen we in 2030 juist níet meer?</li>
+            <li><div class="qn">4</div>Wat is voor onze regio echt gamechanging geweest in 2030?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 2 -->
+    <div class="pane" id="p-fase2">
+      <div class="ph">
+        <div class="ph-tag">Fase 2</div>
+        <div class="ph-title">Optimisme, kritiek &amp; realisme</div>
+        <div class="ph-sub">Toets de gedroomde thema's met jouw unieke rol</div>
+      </div>
+      <div class="timebar">
+        <div class="timebar-icon">⏱</div>
+        <div>
+          <div class="timebar-main">30 min brainstorm</div>
+          <div class="timebar-sub">+ 10 min plenair terugkoppelen</div>
+        </div>
+      </div>
+      <div class="gcard">
+        <div class="gcard-lbl">Jouw groep</div>
+        <div class="gcard-val" id="f2-grp">—</div>
+      </div>
+
+      <!-- Role card (filled by JS) -->
+      <div class="rcard" id="rcard">
+        <div class="rcard-glow"></div>
+        <div class="rcard-tag" id="rcard-tag">Jouw rol</div>
+        <div class="rcard-name" id="rcard-name">—</div>
+        <div class="rcard-illo" id="rcard-illo"></div>
+        <div class="rcard-desc" id="rcard-desc">—</div>
+      </div>
+
+      <div class="sec-lbl">Jouw begeleidende vragen</div>
+      <div class="card rqcard" id="rqcard">
+        <ul class="qlist" id="rq-list"></ul>
+      </div>
+
+      <div class="div"></div>
+      <div class="card">
+        <div class="card-lbl">In jouw groep</div>
+        <div class="chips" id="f2-people">—</div>
+      </div>
+    </div>
+
+    <!-- FASE 3 -->
+    <div class="pane" id="p-fase3">
+      <div class="ph">
+        <div class="ph-tag">Fase 3</div>
+        <div class="ph-title">Van dromen naar concrete acties in H2</div>
+        <div class="ph-sub">Maak het tastbaar en actiegericht</div>
+      </div>
+      <div class="timebar">
+        <div class="timebar-icon">⏱</div>
+        <div>
+          <div class="timebar-main">30 min brainstorm</div>
+          <div class="timebar-sub">+ 10 min plenair terugkoppelen</div>
+        </div>
+      </div>
+      <div class="gcard">
+        <div class="gcard-lbl">Jouw groep</div>
+        <div class="gcard-val" id="f3-grp">—</div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">In jouw groep</div>
+        <div class="chips" id="f3-people">—</div>
+      </div>
+      <div class="div"></div>
+      <div class="sec-lbl">Wat wordt er van je gevraagd?</div>
+      <div class="card" style="margin-bottom:18px">
+        <p class="body-text">Nu gaan we van grote dromen naar concrete stappen. Kies samen de 1 of 2 thema's die jullie discipline het meest raken en beantwoord de vragen zo concreet mogelijk. Wat gaan jullie echt anders doen in H2?</p>
+      </div>
+      <div class="sec-lbl">Begeleidende vragen</div>
+      <div class="card">
+        <ul class="qlist">
+          <li><div class="qn">1</div>Welke 1 of 2 thema's raken onze discipline het meest?</li>
+          <li><div class="qn">2</div>Wat moeten wij in H2 al anders, beter of slimmer gaan doen?</li>
+          <li><div class="qn">3</div>Welke concrete actie kunnen we starten binnen 30 dagen?</li>
+          <li><div class="qn">4</div>Welke actie vraagt samenwerking met een andere discipline?</li>
+          <li><div class="qn">5</div>Wat moeten we stoppen, versimpelen of niet meer doen?</li>
+          <li><div class="qn">6</div>Wat hebben we nodig van MT om dit mogelijk te maken?</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="nav">
+    <button class="nb on" id="nb-home" onclick="showTab('home')">
+      <svg fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nb" id="nb-spelregels" onclick="showTab('spelregels')">
+      <svg fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+      <span>Spelregels</span>
+    </button>
+    <button class="nb" id="nb-fase1" onclick="showTab('fase1')">
+      <svg fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 5 11.9V17a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3.1A7 7 0 0 1 12 2z"/><path d="M9 21h6"/></svg>
+      <span>Fase 1</span>
+    </button>
+    <button class="nb" id="nb-fase2" onclick="showTab('fase2')">
+      <svg fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9.3 17,14 18.6,21 12,17.5 5.4,21 7,14 2,9.3 9,9"/></svg>
+      <span>Fase 2</span>
+    </button>
+    <button class="nb" id="nb-fase3" onclick="showTab('fase3')">
+      <svg fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+      <span>Fase 3</span>
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<script>
+/* ── DATA ─────────────────────────────────────────── */
+const PEOPLE = [
+  { name:"Sven",        f1:"Groep 1", f2:"Groep 2", rol:"superheld", f3:"Groep 1" },
+  { name:"Bram",        f1:"Groep 1", f2:"Groep 3", rol:"superheld", f3:"Groep 1" },
+  { name:"Elske",       f1:"Groep 1", f2:"Groep 1", rol:"superheld", f3:"Groep 2" },
+  { name:"Anne-Sophie", f1:"Groep 1", f2:"Groep 3", rol:"superheld", f3:"Groep 3" },
+  { name:"Britt",       f1:"Groep 2", f2:"Groep 1", rol:"villain",   f3:"Groep 1" },
+  { name:"Richard",     f1:"Groep 2", f2:"Groep 2", rol:"villain",   f3:"Groep 3" },
+  { name:"Ellen",       f1:"Groep 2", f2:"Groep 2", rol:"sidekick",  f3:"Groep 2" },
+  { name:"Bas",         f1:"Groep 2", f2:"Groep 1", rol:"sidekick",  f3:"Groep 2" },
+  { name:"Julia",       f1:"Groep 2", f2:"Groep 2", rol:"villain",   f3:"Groep 3" },
+  { name:"Jordy",       f1:"Groep 3", f2:"Groep 1", rol:"superheld", f3:"Groep 1" },
+  { name:"René",        f1:"Groep 3", f2:"Groep 3", rol:"villain",   f3:"Groep 2" },
+  { name:"Wouter",      f1:"Groep 3", f2:"Groep 3", rol:"sidekick",  f3:"Groep 2" },
+  { name:"Remco",       f1:"Groep 3", f2:"Groep 2", rol:"superheld", f3:"Groep 2" },
+  { name:"Eline",       f1:"Groep 3", f2:"Groep 1", rol:"villain",   f3:"Groep 2" },
+];
+
+const ROLES = {
+  superheld: {
+    label: "Jouw rol",
+    title: "Superheld",
+    desc:  "Jij hebt een positief optimistische houding en belicht het thema met een 'can-do' mentaliteit. Jouw superkracht is hoop en ambitie.",
+    qs: [
+      "Waarom is dit thema kansrijk?",
+      "Wat wordt de beste versie hiervan in 2030?",
+      "Welke superkracht heeft Regio Zuid al om dit waar te maken?",
+      "Wat zou een moedige eerste stap zijn?"
+    ],
+    svg: `<svg width="140" height="130" viewBox="0 0 140 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="g_sh" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F7C948" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#F7C948" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="70" cy="65" r="62" fill="url(#g_sh)"/>
+  <!-- Star -->
+  <polygon points="70,8 76,32 101,32 81,47 88,71 70,56 52,71 59,47 39,32 64,32"
+    fill="#F7C948" opacity="0.95"/>
+  <!-- Cape glow -->
+  <ellipse cx="70" cy="100" rx="28" ry="8" fill="#F7C948" opacity="0.12"/>
+  <!-- Body -->
+  <rect x="62" y="52" width="16" height="28" rx="8" fill="#F7C948"/>
+  <!-- Arms -->
+  <path d="M62 62 L38 56 M78 62 L102 56" stroke="#F7C948" stroke-width="6" stroke-linecap="round"/>
+  <!-- Cape -->
+  <path d="M62 58 Q46 80 42 105 Q56 92 70 90 Q84 92 98 105 Q94 80 78 58" fill="#F7C948" opacity="0.55"/>
+  <!-- Head -->
+  <circle cx="70" cy="44" r="10" fill="#F7C948"/>
+  <!-- Sparkles -->
+  <circle cx="20" cy="25" r="2.5" fill="#F7C948" opacity="0.5"/>
+  <circle cx="118" cy="20" r="2" fill="#F7C948" opacity="0.4"/>
+  <circle cx="15" cy="80" r="1.8" fill="#F7C948" opacity="0.35"/>
+  <circle cx="125" cy="75" r="2.2" fill="#F7C948" opacity="0.45"/>
+  <path d="M110 40 L113 44 L116 40 L113 36 Z" fill="#F7C948" opacity="0.5"/>
+  <path d="M24 50 L27 54 L30 50 L27 46 Z" fill="#F7C948" opacity="0.4"/>
+</svg>`
+  },
+  villain: {
+    label: "Jouw rol",
+    title: "Villain",
+    desc:  "Jij ziet valkuilen, risico's en de 'kan niet'-mentaliteit. Jouw kracht is kritisch denken — je maakt ideeën sterker door ze te testen.",
+    qs: [
+      "Waarom kan dit mislukken?",
+      "Welke aannames zijn te makkelijk gemaakt?",
+      "Waar gaan we onszelf voor de gek houden?",
+      "Wat maakt dit praktisch of commercieel lastig?"
+    ],
+    svg: `<svg width="140" height="130" viewBox="0 0 140 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="g_vi" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF453A" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#FF453A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="70" cy="65" r="62" fill="url(#g_vi)"/>
+  <!-- Cloak/body -->
+  <path d="M70 20 Q40 40 30 110 Q50 85 70 80 Q90 85 110 110 Q100 40 70 20Z"
+    fill="#FF453A" opacity="0.75"/>
+  <!-- Head -->
+  <circle cx="70" cy="35" r="13" fill="#FF453A"/>
+  <!-- Evil horns -->
+  <path d="M60 26 L54 10 L64 22" fill="#FF453A"/>
+  <path d="M80 26 L86 10 L76 22" fill="#FF453A"/>
+  <!-- Eyes glow -->
+  <ellipse cx="64" cy="35" rx="4" ry="3" fill="#1A0000"/>
+  <ellipse cx="76" cy="35" rx="4" ry="3" fill="#1A0000"/>
+  <circle cx="64" cy="35" r="1.5" fill="#FF453A" opacity="0.9"/>
+  <circle cx="76" cy="35" r="1.5" fill="#FF453A" opacity="0.9"/>
+  <!-- Lightning bolts -->
+  <path d="M25 55 L34 42 L30 55 L39 42" stroke="#FF453A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+  <path d="M101 55 L110 42 L106 55 L115 42" stroke="#FF453A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+  <!-- Cracks / X -->
+  <path d="M58 112 L82 112" stroke="#FF453A" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+  <!-- Floating shards -->
+  <polygon points="15,30 20,20 25,30 20,38" fill="#FF453A" opacity="0.3"/>
+  <polygon points="118,45 122,36 126,45 122,52" fill="#FF453A" opacity="0.25"/>
+</svg>`
+  },
+  sidekick: {
+    label: "Jouw rol",
+    title: "Sidekick",
+    desc:  "Jij bent de helpende kracht die vanuit verschillende perspectieven kijkt — de klant, de Rockstar, de samenwerking. Jij verbindt.",
+    qs: [
+      "Wie of wat hebben we nodig om dit te laten slagen?",
+      "Welke disciplines moeten hierin samenwerken?",
+      "Welke randvoorwaarden zijn nodig?",
+      "Hoe zetten we hiermee de Rockstar op 1?"
+    ],
+    svg: `<svg width="140" height="130" viewBox="0 0 140 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="g_sk" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2F9EFF" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#2F9EFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="70" cy="65" r="62" fill="url(#g_sk)"/>
+  <!-- Shield -->
+  <path d="M70 15 L100 30 L100 60 Q100 85 70 100 Q40 85 40 60 L40 30 Z"
+    fill="#2F9EFF" opacity="0.18"/>
+  <path d="M70 15 L100 30 L100 60 Q100 85 70 100 Q40 85 40 60 L40 30 Z"
+    stroke="#2F9EFF" stroke-width="2.5" fill="none" opacity="0.7"/>
+  <!-- Shield emblem: checkmark -->
+  <path d="M55 57 L65 68 L85 48" stroke="#2F9EFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Body (small figure) -->
+  <circle cx="70" cy="35" r="9" fill="#2F9EFF" opacity="0.9"/>
+  <rect x="63" y="45" width="14" height="18" rx="7" fill="#2F9EFF" opacity="0.85"/>
+  <!-- Connecting dots / network -->
+  <circle cx="20" cy="55" r="4" fill="#2F9EFF" opacity="0.4"/>
+  <circle cx="120" cy="55" r="4" fill="#2F9EFF" opacity="0.4"/>
+  <circle cx="35" cy="95" r="3" fill="#2F9EFF" opacity="0.3"/>
+  <circle cx="105" cy="95" r="3" fill="#2F9EFF" opacity="0.3"/>
+  <line x1="24" y1="55" x2="40" y2="50" stroke="#2F9EFF" stroke-width="1.5" opacity="0.3"/>
+  <line x1="116" y1="55" x2="100" y2="50" stroke="#2F9EFF" stroke-width="1.5" opacity="0.3"/>
+  <line x1="37" y1="92" x2="48" y2="80" stroke="#2F9EFF" stroke-width="1.5" opacity="0.25"/>
+  <line x1="103" y1="92" x2="92" y2="80" stroke="#2F9EFF" stroke-width="1.5" opacity="0.25"/>
+</svg>`
+  }
+};
+
+/* ── STATE ────────────────────────────────────────── */
+let currentUser = null;
+let activeTab = 'home';
+
+/* ── INIT ─────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  buildNameList();
+  const saved = localStorage.getItem('rz_user');
+  if (saved) {
+    const user = PEOPLE.find(p => p.name === saved);
+    if (user) { selectUser(user, false); return; }
+  }
+});
+
+function buildNameList() {
+  const list = document.getElementById('name-list');
+  [...PEOPLE].sort((a, b) => a.name.localeCompare(b.name, 'nl')).forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'name-btn';
+    btn.innerHTML = `<span>${p.name}</span><span class="name-arr">›</span>`;
+    btn.addEventListener('click', () => selectUser(p, true));
+    list.appendChild(btn);
+  });
+}
+
+function selectUser(user, animate) {
+  currentUser = user;
+  localStorage.setItem('rz_user', user.name);
+
+  // Populate UI
+  const init = user.name.slice(0,2).toUpperCase();
+  document.getElementById('hdr-av').textContent   = init;
+  document.getElementById('hdr-name').textContent = user.name;
+  document.getElementById('w-name').textContent   = user.name;
+
+  // Home overview
+  document.getElementById('ov-g1').textContent = user.f1;
+  document.getElementById('ov-g2').textContent = user.f2;
+  document.getElementById('ov-g3').textContent = user.f3;
+  const rb = document.getElementById('ov-rbadge');
+  rb.textContent = capitalize(user.rol);
+  rb.className   = `rbadge ${user.rol}`;
+
+  // Fase 1
+  document.getElementById('f1-grp').textContent = user.f1;
+  renderChips('f1-people', PEOPLE.filter(p => p.f1 === user.f1), user.name, 'f1');
+
+  // Fase 2
+  document.getElementById('f2-grp').textContent = user.f2;
+  renderChips('f2-people', PEOPLE.filter(p => p.f2 === user.f2), user.name, 'f2');
+  renderRoleCard(user.rol);
+
+  // Fase 3
+  document.getElementById('f3-grp').textContent = user.f3;
+  renderChips('f3-people', PEOPLE.filter(p => p.f3 === user.f3), user.name, 'f3');
+
+  // Transition
+  const picker = document.getElementById('picker');
+  const app    = document.getElementById('app');
+  if (animate) {
+    picker.classList.add('out');
+    setTimeout(() => { app.classList.add('show'); }, 200);
+  } else {
+    picker.classList.add('out');
+    app.classList.add('show');
+  }
+}
+
+function renderChips(containerId, people, myName, field) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  people.forEach(p => {
+    const c = document.createElement('div');
+    const isMe = p.name === myName;
+    if (field === 'f2') {
+      c.className = `chip${isMe ? ' me' : ''}`;
+      c.innerHTML = `<span class="rdot ${p.rol}"></span>${p.name}`;
+    } else {
+      c.className = `chip${isMe ? ' me' : ''}`;
+      c.textContent = p.name;
+    }
+    el.appendChild(c);
+  });
+}
+
+function renderRoleCard(rol) {
+  const r = ROLES[rol];
+  if (!r) return;
+  const card = document.getElementById('rcard');
+  card.className = `rcard ${rol}`;
+  document.getElementById('rcard-tag').textContent  = r.label;
+  document.getElementById('rcard-name').textContent = r.title;
+  document.getElementById('rcard-illo').innerHTML   = r.svg;
+  document.getElementById('rcard-desc').textContent = r.desc;
+
+  const rqcard = document.getElementById('rqcard');
+  rqcard.className = `card rqcard ${rol}`;
+  const list = document.getElementById('rq-list');
+  list.innerHTML = r.qs.map((q,i) =>
+    `<li><div class="qn ${rol !== 'superheld' ? rol : ''}">${i+1}</div>${q}</li>`
+  ).join('');
+}
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function resetUser() {
+  if (!confirm('Naam wijzigen?')) return;
+  localStorage.removeItem('rz_user');
+  currentUser = null;
+  document.getElementById('picker').classList.remove('out');
+  document.getElementById('app').classList.remove('show');
+}
+
+/* ── NAVIGATION ───────────────────────────────────── */
+function showTab(tab) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+  document.getElementById(`p-${tab}`).classList.add('on');
+  document.getElementById(`p-${tab}`).scrollTop = 0;
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  document.getElementById(`nb-${tab}`).classList.add('on');
+  activeTab = tab;
+}
+
+/* ── COLLAPSIBLE QUESTIONS ────────────────────────── */
+function toggleQ(head) {
+  const body = head.nextElementSibling;
+  const isOpen = head.classList.contains('open');
+  head.classList.toggle('open', !isOpen);
+  body.classList.toggle('open', !isOpen);
+}
+</script>
+</body>
+</html>
