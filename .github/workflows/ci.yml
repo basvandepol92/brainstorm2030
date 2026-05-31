@@ -34,10 +34,10 @@ jobs:
         run: npm run test:coverage
 
       - name: Build
+        # Served from the root of the custom domain (brainstorm2030.nl),
+        # so the default base path "/" is correct. For a project site at
+        # https://<owner>.github.io/<repo>/ set VITE_BASE: /<repo>/ instead.
         run: npm run build
-        env:
-          # Project-site base path: https://<owner>.github.io/<repo>/
-          VITE_BASE: /${{ github.event.repository.name }}/
 
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'
