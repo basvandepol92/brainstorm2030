@@ -5,10 +5,10 @@ import type { Person } from '../../data/types';
 import {
   Card,
   CardLabel,
-  Chips,
   Collapsible,
   Divider,
   GroupCard,
+  GroupTiles,
   PageHeader,
   QuestionList,
   SectionLabel,
@@ -29,7 +29,7 @@ export function Fase1Tab({ user }: { user: Person }) {
       <GroupCard group={user.f1} />
       <Card>
         <CardLabel>In jouw groep</CardLabel>
-        <Chips people={mates} myName={user.name} />
+        <GroupTiles people={mates} myName={user.name} />
       </Card>
 
       <Divider />

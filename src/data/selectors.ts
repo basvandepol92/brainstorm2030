@@ -42,7 +42,7 @@ export function capitalize(value: string): string {
 }
 
 export const ROLE_LABEL: Record<Role, string> = {
-  superheld: 'Superheld',
+  superhero: 'Superhero',
   villain: 'Villain',
   sidekick: 'Sidekick',
 };

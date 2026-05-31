@@ -1,4 +1,4 @@
-export type Role = 'superheld' | 'villain' | 'sidekick';
+export type Role = 'superhero' | 'villain' | 'sidekick';
 
 export type Group = 'Groep 1' | 'Groep 2' | 'Groep 3';
 

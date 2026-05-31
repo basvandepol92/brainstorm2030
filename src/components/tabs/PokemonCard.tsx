@@ -7,31 +7,31 @@ import type { Person, Role } from '../../data/types';
 const CARD_EXTENSIONS = ['png', 'jpg'] as const;
 
 const FRAME: Record<Role, string> = {
-  superheld: 'from-[#ffe690] via-[#f7c948] to-[#b8860b]',
+  superhero: 'from-[#ffe690] via-[#f7c948] to-[#b8860b]',
   villain: 'from-[#ff9a92] via-[#ff453a] to-[#8b1a12]',
   sidekick: 'from-[#9ccdff] via-[#2f9eff] to-[#0a4a8c]',
 };
 
 const ART_TINT: Record<Role, string> = {
-  superheld: 'from-[#2a2207] to-[#0d0b03]',
+  superhero: 'from-[#2a2207] to-[#0d0b03]',
   villain: 'from-[#2a0a07] to-[#0d0403]',
   sidekick: 'from-[#06192a] to-[#03090d]',
 };
 
 const TYPE_PILL: Record<Role, string> = {
-  superheld: 'bg-brand text-black',
+  superhero: 'bg-brand text-black',
   villain: 'bg-villain text-white',
   sidekick: 'bg-sidekick text-white',
 };
 
 const ACCENT_TEXT: Record<Role, string> = {
-  superheld: 'text-[#7a5b00]',
+  superhero: 'text-[#7a5b00]',
   villain: 'text-[#7a1109]',
   sidekick: 'text-[#0a4a8c]',
 };
 
 const GLOW: Record<Role, string> = {
-  superheld: 'bg-brand',
+  superhero: 'bg-brand',
   villain: 'bg-villain',
   sidekick: 'bg-sidekick',
 };

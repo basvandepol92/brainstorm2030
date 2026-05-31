@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
-import { initials } from '../data/selectors';
-import type { Person } from '../data/types';
+import { ROLE_LABEL } from '../data/selectors';
+import type { Person, Role } from '../data/types';
+import { Avatar } from './Avatar';
 
 export function PageHeader({ tag, title, sub }: { tag: string; title: string; sub?: string }) {
   return (
@@ -77,13 +78,17 @@ export function GroupCard({ group }: { group: string }) {
   );
 }
 
-const ROLE_DOT: Record<string, string> = {
-  superheld: 'bg-superheld',
-  villain: 'bg-villain',
-  sidekick: 'bg-sidekick',
+const ROLE_TEXT: Record<Role, string> = {
+  superhero: 'text-superhero',
+  villain: 'text-villain',
+  sidekick: 'text-sidekick',
 };
 
-export function Chips({
+/**
+ * Grid of group members as tiles, each showing the person's avatar and name.
+ * When `showRole` is set (Fase 2) the tile also notes the person's role.
+ */
+export function GroupTiles({
   people,
   myName,
   showRole = false,
@@ -93,29 +98,47 @@ export function Chips({
   showRole?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="grid grid-cols-2 gap-2.5">
       {people.map((p) => {
         const isMe = p.name === myName;
         return (
           <div
             key={p.name}
-            className={`flex items-center gap-1.5 rounded-full py-1.5 pr-3 pl-1.5 text-[13px] ${
-              isMe
-                ? 'bg-gradient-to-br from-amber to-brand font-bold text-black'
-                : 'glass-soft font-medium'
+            className={`flex items-center gap-2.5 rounded-2xl p-2.5 ${
+              isMe ? 'bg-gradient-to-br from-amber to-brand text-black' : 'glass-soft'
             }`}
           >
-            <span
-              className={`flex size-6 items-center justify-center rounded-full text-[10px] font-bold ${
-                isMe ? 'bg-black/15 text-black' : 'bg-white/10 text-ink/80'
+            <Avatar
+              name={p.name}
+              className={`size-10 rounded-xl ${
+                isMe ? 'ring-2 ring-black/15' : 'bg-white/10 ring-1 ring-white/10'
               }`}
-            >
-              {initials(p.name)}
-            </span>
-            {p.name}
-            {showRole && !isMe && (
-              <span className={`ml-0.5 size-2 rounded-full ${ROLE_DOT[p.rol]}`} />
-            )}
+              textClassName={`text-[12px] font-black ${isMe ? 'text-black' : 'text-ink/80'}`}
+            />
+            <div className="min-w-0 flex-1">
+              <div
+                className={`truncate text-[13.5px] leading-tight font-bold ${
+                  isMe ? 'text-black' : 'text-ink'
+                }`}
+              >
+                {p.name}
+              </div>
+              {showRole ? (
+                <div
+                  className={`mt-0.5 truncate text-[11px] leading-tight font-semibold ${
+                    isMe ? 'text-black/70' : ROLE_TEXT[p.rol]
+                  }`}
+                >
+                  {ROLE_LABEL[p.rol]}
+                </div>
+              ) : (
+                isMe && (
+                  <div className="mt-0.5 text-[11px] leading-tight font-semibold text-black/70">
+                    Jij
+                  </div>
+                )
+              )}
+            </div>
           </div>
         );
       })}
@@ -124,17 +147,17 @@ export function Chips({
 }
 
 const QN_ACCENT: Record<string, string> = {
-  superheld: 'from-amber to-brand text-black',
+  superhero: 'from-amber to-brand text-black',
   villain: 'from-villain to-[#ff7a70] text-black',
   sidekick: 'from-sidekick to-[#6fbcff] text-black',
 };
 
 export function QuestionList({
   questions,
-  accent = 'superheld',
+  accent = 'superhero',
 }: {
   questions: string[];
-  accent?: 'superheld' | 'villain' | 'sidekick';
+  accent?: Role;
 }) {
   return (
     <ul className="flex list-none flex-col gap-3.5">

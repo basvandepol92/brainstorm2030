@@ -68,7 +68,7 @@ describe('initials & capitalize', () => {
   });
 
   it('capitalizes the first letter', () => {
-    expect(capitalize('superheld')).toBe('Superheld');
+    expect(capitalize('superhero')).toBe('Superhero');
   });
 });
 
@@ -91,7 +91,7 @@ describe('avatarSlug', () => {
 describe('ROLE_LABEL', () => {
   it('maps every role key', () => {
     expect(ROLE_LABEL).toEqual({
-      superheld: 'Superheld',
+      superhero: 'Superhero',
       villain: 'Villain',
       sidekick: 'Sidekick',
     });

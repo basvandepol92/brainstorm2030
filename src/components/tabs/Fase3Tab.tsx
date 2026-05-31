@@ -5,9 +5,9 @@ import type { Person } from '../../data/types';
 import {
   Card,
   CardLabel,
-  Chips,
   Divider,
   GroupCard,
+  GroupTiles,
   PageHeader,
   QuestionList,
   SectionLabel,
@@ -28,7 +28,7 @@ export function Fase3Tab({ user }: { user: Person }) {
       <GroupCard group={user.f3} />
       <Card>
         <CardLabel>In jouw groep</CardLabel>
-        <Chips people={mates} myName={user.name} />
+        <GroupTiles people={mates} myName={user.name} />
       </Card>
 
       <Divider />

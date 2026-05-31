@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { groupMates } from '../../data/selectors';
 import { PEOPLE } from '../../data/people';
 import type { Person } from '../../data/types';
-import { Card, CardLabel, Chips, Divider, GroupCard, PageHeader, SectionLabel, TimeBar } from '../ui';
+import { Card, CardLabel, Divider, GroupCard, GroupTiles, PageHeader, SectionLabel, TimeBar } from '../ui';
 import { PokemonCard } from './PokemonCard';
 
 export function Fase2Tab({ user }: { user: Person }) {
@@ -40,7 +40,7 @@ export function Fase2Tab({ user }: { user: Person }) {
       <Divider />
       <Card>
         <CardLabel>In jouw groep</CardLabel>
-        <Chips people={mates} myName={user.name} showRole />
+        <GroupTiles people={mates} myName={user.name} showRole />
       </Card>
     </>
   );

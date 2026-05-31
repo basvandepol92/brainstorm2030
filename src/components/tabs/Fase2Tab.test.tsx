@@ -12,8 +12,8 @@ describe('Fase2Tab', () => {
     const julia = findByName(PEOPLE, 'Julia')!; // villain
     render(<Fase2Tab user={julia} />);
 
-    // Role is hidden behind the reveal button.
-    expect(screen.queryByText('Villain')).not.toBeInTheDocument();
+    // The role card (and its questions) is hidden behind the reveal button.
+    expect(screen.queryByText('Jij geeft antwoorden op vragen als:')).not.toBeInTheDocument();
     expect(screen.queryByText(ROLES.villain.questions[0])).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /toon mijn rol/i }));

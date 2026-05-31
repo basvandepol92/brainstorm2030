@@ -9,7 +9,7 @@ export interface RoleInfo {
   illustration: ReactNode;
 }
 
-const SuperheldIllo = (
+const SuperheroIllo = (
   <svg width="140" height="130" viewBox="0 0 140 130" fill="none" aria-hidden="true">
     <defs>
       <radialGradient id="g_sh" cx="50%" cy="50%" r="50%">
@@ -126,8 +126,8 @@ const SidekickIllo = (
 );
 
 export const ROLES: Record<Role, RoleInfo> = {
-  superheld: {
-    title: 'Superheld',
+  superhero: {
+    title: 'Superhero',
     attitude: 'Positief optimistisch',
     desc: "Jij hebt een positief optimistische houding en belicht het thema met een 'can-do' mentaliteit. Jouw superkracht is hoop en ambitie.",
     questions: [
@@ -136,7 +136,7 @@ export const ROLES: Record<Role, RoleInfo> = {
       'Welke superkracht heeft Regio Zuid al om dit waar te maken?',
       'Wat zou een moedige eerste stap zijn?',
     ],
-    illustration: SuperheldIllo,
+    illustration: SuperheroIllo,
   },
   villain: {
     title: 'Villain',
