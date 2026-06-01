@@ -65,8 +65,9 @@ describe('VotingTab', () => {
       />,
     );
     expect(screen.getByText('Uitslag')).toBeInTheDocument();
-    // Winner gets a trophy prefix.
-    expect(screen.getByText(/🏆/)).toBeInTheDocument();
+    // Top-9 carry-forward is communicated and counted.
+    expect(screen.getByText(/top 9/i)).toBeInTheDocument();
+    expect(screen.getByText(/hebben gestemd/i)).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
   });
 });

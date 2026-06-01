@@ -24,7 +24,7 @@ export default function LiveApp() {
   const { state, status, vote } = useSession(user?.name ?? null);
   const [tab, setTab] = useState<LiveTab>('nu');
 
-  // When the begeleider advances the stage, pull everyone to the live view.
+  // When Bas advances the stage, pull everyone to the live view.
   const prevStage = useRef<LiveStage | null>(null);
   const stage = state?.stage ?? null;
   useEffect(() => {
@@ -127,7 +127,7 @@ function Lobby({ user }: { user: Person }) {
       />
       <Card>
         <p className="text-[14px] leading-[1.7] text-ink/75">
-          Houd dit scherm bij de hand. Zodra de begeleider een fase start, verschijnt hier je groep,
+          Houd dit scherm bij de hand. Zodra Bas een fase start, verschijnt hier je groep,
           de opdracht en hoelaat je weer terug moet zijn. Op de Home-tab zie je vast je indeling per
           fase.
         </p>

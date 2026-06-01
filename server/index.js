@@ -21,7 +21,7 @@ import {
 /**
  * Zero-dependency HTTP server (Node built-ins only) so there is no supply-chain
  * surface to trust and it runs anywhere. Serves the built front-end (dist/),
- * the begeleider console (/admin) and the JSON API (/api) on one origin.
+ * the Bas console (/admin) and the JSON API (/api) on one origin.
  */
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -39,7 +39,7 @@ const CORS_ORIGINS = (process.env.CORS_ORIGINS || '')
 if (!ADMIN_PASSWORD) {
   console.warn(
     '[security] ADMIN_PASSWORD is not set — admin endpoints return 503. ' +
-      'Set ADMIN_PASSWORD to enable the begeleider console.',
+      'Set ADMIN_PASSWORD to enable the Bas console.',
   );
 }
 

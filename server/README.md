@@ -4,7 +4,7 @@ Een **dependency-vrije** Node-server (alleen Node-ingebouwde modules) die op Ã©Ã
 origin draait:
 
 - de gebouwde front-end (`dist/`, via `npm run build`)
-- de begeleider-console op **`/admin`**
+- de console voor Bas op **`/admin`**
 - de JSON-API op **`/api`**
 
 De server houdt de live sessie bij: welke fase actief is, de starttijd/terugkomtijd
@@ -20,7 +20,7 @@ npm run server:dev            # start op http://localhost:3001
 ```
 
 - Deelnemers-app: <http://localhost:3001>
-- Begeleider-console: <http://localhost:3001/admin>
+- Console voor Bas: <http://localhost:3001/admin>
 
 Backend-tests: `npm run test:server`.
 

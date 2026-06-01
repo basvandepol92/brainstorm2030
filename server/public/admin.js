@@ -1,6 +1,7 @@
 'use strict';
 
 const TOKEN_KEY = 'rz_admin_token';
+const TOP_N = 9;
 const STAGES = [
   { id: 'home', label: 'Home / lobby' },
   { id: 'fase1', label: 'Fase 1' },
@@ -182,6 +183,27 @@ function render() {
     `<div class="chips">${
       chips(pending, 'pending') || '<span class="muted" style="font-size:12px">Iedereen heeft gestemd 🎉</span>'
     }</div>`;
+
+  // Uitslag: gerangschikt, top 9 gaat door naar fase 2
+  const ranked = [...state.outcomes]
+    .map((o) => ({ ...o, count: counts[o.id] || 0 }))
+    .sort((a, b) => b.count - a.count);
+  const rmax = Math.max(1, ...ranked.map((r) => r.count));
+  const through = ranked.filter((o, i) => i < TOP_N && o.count > 0).length;
+  $('tally').innerHTML = ranked.length
+    ? `<div class="label">Uitslag · top ${TOP_N} gaat door (${through})</div>` +
+      ranked
+        .map((o, i) => {
+          const ok = i < TOP_N && o.count > 0;
+          return (
+            `<div class="outcome" style="${ok ? 'border-color:rgba(247,201,72,0.4)' : 'opacity:0.6'}">` +
+            `<div><div class="txt"><span style="color:${ok ? 'var(--brand)' : 'var(--dim)'};font-weight:900">${i + 1}.</span> ${escapeHtml(o.text)}</div>` +
+            `<div class="bar" style="width:${(o.count / rmax) * 100}%;${ok ? '' : 'background:rgba(255,255,255,0.25)'}"></div></div>` +
+            `<div style="font-weight:900;color:${ok ? 'var(--brand)' : 'var(--dim)'}">${o.count}</div></div>`
+          );
+        })
+        .join('')
+    : '';
 }
 
 function escapeHtml(s) {

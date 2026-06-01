@@ -120,7 +120,7 @@ function LiveTimeBar({ timer }: { timer: Timer }) {
         tone="muted"
         icon={ClockIcon}
         title="Nog niet gestart"
-        sub="Wacht op de begeleider"
+        sub="Wacht op Bas"
       />
     );
   }

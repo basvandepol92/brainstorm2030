@@ -61,8 +61,7 @@ export function VotingTab({ outcomes, voting, myVote, tallies, votesCast, onVote
       ) : !voting.open ? (
         <Card>
           <p className="text-[14px] leading-[1.6] text-ink/75">
-            Stemmen is op dit moment gesloten. Houd dit scherm in de gaten — de begeleider opent het
-            zo.
+            Stemmen is op dit moment gesloten. Houd dit scherm in de gaten — Bas opent het zo.
           </p>
         </Card>
       ) : (
@@ -142,6 +141,8 @@ export function VotingTab({ outcomes, voting, myVote, tallies, votesCast, onVote
   );
 }
 
+const TOP_N = 9;
+
 function Results({
   outcomes,
   tallies,
@@ -159,32 +160,56 @@ function Results({
   }, [outcomes, tallies]);
 
   const max = Math.max(1, ...ranked.map((r) => r.count));
+  const isThrough = (rank: number, count: number) => rank < TOP_N && count > 0;
+  const throughCount = ranked.filter((o, i) => isThrough(i, o.count)).length;
 
   return (
     <>
       <SectionLabel>Uitslag</SectionLabel>
-      <div className="flex flex-col gap-2.5">
-        {ranked.map((o, i) => (
-          <div key={o.id} className="glass rounded-[18px] p-4">
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <span className="text-[15px] font-bold">
-                {i === 0 && o.count > 0 ? '🏆 ' : ''}
-                {o.text}
-              </span>
-              <span className="text-[14px] font-black text-brand">{o.count}</span>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/10">
-              <div
-                className={`h-full rounded-full ${
-                  i === 0 && o.count > 0 ? 'bg-gradient-to-r from-amber to-brand' : 'bg-white/30'
-                }`}
-                style={{ width: `${(o.count / max) * 100}%` }}
-              />
-            </div>
-          </div>
-        ))}
+      <div className="glass mb-4 rounded-[18px] px-4 py-3 text-[13px] leading-[1.5] text-ink/75">
+        De <span className="font-bold text-brand">top {TOP_N}</span> met de meeste stemmen gaat door
+        naar fase 2.
       </div>
-      <p className="mt-4 text-center text-[12px] text-dim">{votesCast} van 14 hebben gestemd</p>
+      <div className="flex flex-col gap-2.5">
+        {ranked.map((o, i) => {
+          const through = isThrough(i, o.count);
+          return (
+            <div
+              key={o.id}
+              className={`rounded-[18px] p-4 ${
+                through ? 'glass ring-1 ring-brand/30' : 'glass-soft opacity-70'
+              }`}
+            >
+              <div className="mb-2 flex items-center gap-3">
+                <span
+                  className={`grid size-6 flex-shrink-0 place-items-center rounded-lg text-[12px] font-black ${
+                    through ? 'bg-gradient-to-br from-amber to-brand text-black' : 'bg-white/10 text-dim'
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                <span className={`flex-1 text-[15px] font-bold ${through ? '' : 'text-dim'}`}>
+                  {o.text}
+                </span>
+                <span className={`text-[14px] font-black ${through ? 'text-brand' : 'text-dim'}`}>
+                  {o.count}
+                </span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className={`h-full rounded-full ${
+                    through ? 'bg-gradient-to-r from-amber to-brand' : 'bg-white/25'
+                  }`}
+                  style={{ width: `${(o.count / max) * 100}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-4 text-center text-[12px] text-dim">
+        {votesCast} van 14 hebben gestemd · {throughCount} door naar fase 2
+      </p>
     </>
   );
 }

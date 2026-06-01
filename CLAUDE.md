@@ -140,14 +140,14 @@ Elke rol heeft een SVG-illustratie inline in de `ROLES`-object.
 
 ## Backend & live-modus (`server/`)
 
-Optionele, **dependency-vrije** Node-server (alleen ingebouwde modules) die op één origin draait en zowel de gebouwde front-end (`dist/`), de begeleider-console (`/admin`) als de JSON-API (`/api`) serveert. Bedoeld voor goedkope hosting op Railway. Zie `server/README.md` voor deploy- en beveiligingsdetails.
+Optionele, **dependency-vrije** Node-server (alleen ingebouwde modules) die op één origin draait en zowel de gebouwde front-end (`dist/`), de console voor Bas (`/admin`) als de JSON-API (`/api`) serveert. Bedoeld voor goedkope hosting op Railway. Zie `server/README.md` voor deploy- en beveiligingsdetails.
 
 **Wat de backend stuurt:**
 
 - **Actieve fase** centraal (`stage`: `home` / `fase1` / `voting` / `fase2` / `fase3` / `done`). Deelnemers kiezen niet meer zelf hun fase; de front-end toont automatisch de actieve fase.
 - **Starttijd + duur per onderdeel** → de front-end toont een live countdown en "terug om HH:MM".
-- **Opbrengsten fase 1** die de begeleider live meeschrijft.
-- **Dotvoten** tussen fase 1 en 2: elke deelnemer kiest max. N opbrengsten (1 stembiljet per naam, serverseits afgedwongen); uitslag wordt door de begeleider vrijgegeven.
+- **Opbrengsten fase 1** die Bas live meeschrijft.
+- **Dotvoten** tussen fase 1 en 2: elke deelnemer kiest max. N opbrengsten (1 stembiljet per naam, serverseits afgedwongen); top 9 gaat door, uitslag wordt door Bas vrijgegeven.
 
 **Twee modi (front-end):**
 
@@ -161,7 +161,7 @@ Optionele, **dependency-vrije** Node-server (alleen ingebouwde modules) die op �
 | `server/index.js` | HTTP-server, routing, security headers, rate limiting, static serving |
 | `server/state.js` | Persistente JSON-state (op `DATA_DIR`, default `./data`) + mutaties |
 | `server/participants.js` | Bekende deelnemersnamen (sync houden met `src/data/people.ts`) |
-| `server/public/admin.{html,js}` | Begeleider-console |
+| `server/public/admin.{html,js}` | Console voor Bas |
 | `src/session/` | API-client, types, timer-context (front-end live-modus) |
 | `src/hooks/useSession.ts` | Polling van `/api/state` + stem-actie |
 | `src/components/LiveApp.tsx` | Live-modus shell + fase-routing |
