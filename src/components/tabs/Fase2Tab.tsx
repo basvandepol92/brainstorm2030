@@ -16,7 +16,7 @@ export function Fase2Tab({ user }: { user: Person }) {
         title="Optimisme, kritiek & realisme"
         sub="Toets de gedroomde thema's met jouw unieke rol"
       />
-      <TimeBar />
+      <TimeBar phase="fase2" />
       <GroupCard group={user.f2} />
 
       <SectionLabel>Jouw rol</SectionLabel>

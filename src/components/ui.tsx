@@ -1,6 +1,8 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ROLE_LABEL } from '../data/selectors';
 import type { Person, Role } from '../data/types';
+import { usePhaseTimer } from '../session/SessionContext';
+import type { LivePhase, Timer } from '../session/types';
 import { Avatar } from './Avatar';
 
 export function PageHeader({ tag, title, sub }: { tag: string; title: string; sub?: string }) {
@@ -39,28 +41,124 @@ export function CardLabel({ children }: { children: ReactNode }) {
   );
 }
 
-export function TimeBar() {
+const ClockIcon = (
+  <svg
+    className="size-[22px]"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.4"
+    strokeLinecap="round"
+    viewBox="0 0 24 24"
+  >
+    <circle cx="12" cy="13" r="8" />
+    <path d="M12 9v4l2.5 2.5M9 2h6" />
+  </svg>
+);
+
+function TimeShell({
+  icon,
+  title,
+  sub,
+  tone = 'brand',
+}: {
+  icon: ReactNode;
+  title: ReactNode;
+  sub: ReactNode;
+  tone?: 'brand' | 'villain' | 'muted';
+}) {
+  const iconBg =
+    tone === 'villain'
+      ? 'from-villain to-[#ff7a70]'
+      : tone === 'muted'
+        ? 'from-white/15 to-white/5'
+        : 'from-amber to-brand';
   return (
     <div className="glass mb-4 flex items-center gap-3.5 rounded-[20px] p-3.5">
-      <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber to-brand text-black shadow-[0_6px_16px_-6px_rgba(247,201,72,0.7)]">
-        <svg
-          className="size-[22px]"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          viewBox="0 0 24 24"
-        >
-          <circle cx="12" cy="13" r="8" />
-          <path d="M12 9v4l2.5 2.5M9 2h6" />
-        </svg>
+      <div
+        className={`flex size-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${iconBg} ${tone === 'muted' ? 'text-ink/80' : 'text-black'} shadow-[0_6px_16px_-6px_rgba(247,201,72,0.6)]`}
+      >
+        {icon}
       </div>
-      <div>
-        <div className="text-[17px] font-extrabold tracking-[-0.01em]">30 min brainstorm</div>
-        <div className="mt-0.5 text-[12.5px] text-dim">+ 10 min plenair terugkoppelen</div>
+      <div className="min-w-0">
+        <div className="text-[17px] font-extrabold tracking-[-0.01em]">{title}</div>
+        <div className="mt-0.5 text-[12.5px] text-dim">{sub}</div>
       </div>
     </div>
   );
+}
+
+function StaticTimeBar() {
+  return (
+    <TimeShell
+      icon={ClockIcon}
+      title="30 min brainstorm"
+      sub="+ 10 min plenair terugkoppelen"
+    />
+  );
+}
+
+function useNow(intervalMs: number) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
+
+function clock(d: Date) {
+  return d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+}
+
+function LiveTimeBar({ timer }: { timer: Timer }) {
+  const now = useNow(1000);
+  const start = timer.startTime ? new Date(timer.startTime) : null;
+
+  if (!start) {
+    return (
+      <TimeShell
+        tone="muted"
+        icon={ClockIcon}
+        title="Nog niet gestart"
+        sub="Wacht op de begeleider"
+      />
+    );
+  }
+
+  const end = new Date(start.getTime() + timer.durationMin * 60000);
+  const remaining = end.getTime() - now;
+
+  if (remaining <= 0) {
+    return (
+      <TimeShell
+        tone="villain"
+        icon={<span className="text-[20px]">⏰</span>}
+        title="Tijd voorbij"
+        sub="Kom terug — we koppelen plenair terug"
+      />
+    );
+  }
+
+  const totalSec = Math.floor(remaining / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return (
+    <TimeShell
+      icon={ClockIcon}
+      title={
+        <span>
+          {m}:{String(s).padStart(2, '0')}{' '}
+          <span className="text-[13px] font-semibold text-dim">resterend</span>
+        </span>
+      }
+      sub={`Terug om ${clock(end)} uur`}
+    />
+  );
+}
+
+export function TimeBar({ phase }: { phase?: LivePhase } = {}) {
+  const timer = usePhaseTimer(phase);
+  return timer ? <LiveTimeBar timer={timer} /> : <StaticTimeBar />;
 }
 
 export function GroupCard({ group }: { group: string }) {
