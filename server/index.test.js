@@ -87,6 +87,17 @@ describe('public + admin API', () => {
     assert.equal(s.timers.fase1.durationMin, 30);
   });
 
+  test('resetting a timer clears its start time but keeps the duration', async () => {
+    await fetch(url('/api/admin/timer'), {
+      method: 'POST',
+      headers: admin,
+      body: JSON.stringify({ phase: 'fase1', startTime: null }),
+    });
+    const s = await (await fetch(url('/api/state'))).json();
+    assert.equal(s.timers.fase1.startTime, null);
+    assert.equal(s.timers.fase1.durationMin, 30);
+  });
+
   test('full voting flow: add outcomes, open, vote, tally', async () => {
     const a = await (
       await fetch(url('/api/admin/outcomes'), {

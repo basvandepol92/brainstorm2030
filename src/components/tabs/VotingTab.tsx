@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Outcome, VotingConfig } from '../../session/types';
-import { Card, PageHeader, SectionLabel } from '../ui';
+import { Card, PageHeader, SectionLabel, TimeBar } from '../ui';
 
 interface Props {
   outcomes: Outcome[];
@@ -55,6 +55,8 @@ export function VotingTab({ outcomes, voting, myVote, tallies, votesCast, onVote
         title="Stem op de opbrengsten"
         sub="Welke dromen nemen we mee naar fase 2?"
       />
+
+      <TimeBar phase="voting" />
 
       {voting.resultsRevealed ? (
         <Results outcomes={outcomes} tallies={tallies} votesCast={votesCast} />

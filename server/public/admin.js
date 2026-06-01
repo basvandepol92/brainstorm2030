@@ -121,7 +121,16 @@ function render() {
     startBtn.textContent = 'Start nu';
     startBtn.onclick = () =>
       act(() => api('/timer', 'POST', { phase: p.id, startNow: true }), `${p.label} gestart`);
-    row.append(info, dur, startBtn);
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'ghost';
+    resetBtn.textContent = 'Reset';
+    resetBtn.disabled = !t.startTime;
+    resetBtn.onclick = () =>
+      act(() => api('/timer', 'POST', { phase: p.id, startTime: null }), `${p.label} timer gereset`);
+    const actions = document.createElement('div');
+    actions.className = 'row';
+    actions.append(startBtn, resetBtn);
+    row.append(info, dur, actions);
     timers.appendChild(row);
   }
 
