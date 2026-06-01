@@ -23,16 +23,23 @@ function url(p) {
 
 before(async () => {
   load();
-  await new Promise((resolve) => {
-    server = createApp().listen(0, () => {
+  await new Promise((resolve, reject) => {
+    server = createApp();
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      server.off('error', reject);
       base = `http://127.0.0.1:${server.address().port}`;
       resolve();
     });
   });
 });
 
-after(() => {
-  server?.close();
+after(async () => {
+  server?.closeAllConnections?.();
+  await new Promise((resolve, reject) => {
+    if (!server || !server.listening) return resolve();
+    server.close((err) => (err ? reject(err) : resolve()));
+  });
   rmSync(DATA_DIR, { recursive: true, force: true });
 });
 
