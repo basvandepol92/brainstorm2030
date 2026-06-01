@@ -2,15 +2,17 @@
 
 ## Wat is dit?
 
-Een mobiele webapp (single-file HTML) voor een interne brainstormsessie van Regio Zuid. Deelnemers openen de app op hun telefoon tijdens de sessie. De app is hostbaar op GitHub Pages als `index.html`.
+Een mobiele webapp voor een interne brainstormsessie van Regio Zuid. Deelnemers openen de app op hun telefoon tijdens de sessie.
+
+> **Let op (juni 2026):** de app is geen single-file HTML meer. Het is een **React + TypeScript + Vite + Tailwind v4**-project met tests (Vitest). De beschrijving hieronder is grotendeels nog inhoudelijk geldig (data, fases, content), maar de implementatie zit in `src/`. Daarnaast is er een optionele **NodeJS-backend** (`server/`) voor live sessiebesturing — zie "Backend & live-modus" onderaan.
 
 ## Technische opzet
 
-- **Eén bestand**: `index.html` — geen build-stap, geen dependencies, geen externe JS
-- **Hosting**: GitHub Pages (gewoon `index.html` in de root van een repo)
+- **Stack**: React 19 + TypeScript + Vite 6 + Tailwind v4; tests via Vitest. Entry: `index.html` → `src/main.tsx` → `src/App.tsx`.
+- **Hosting front-end**: GitHub Pages (CI bouwt `dist/` → standalone modus) én/of Railway (samen met de backend → live modus).
 - **Font**: Inter via Google Fonts CDN
-- **Opslag**: `localStorage` voor naam van de deelnemer (persisteert over page refreshes)
-- **Geen frameworks**: vanilla HTML/CSS/JS
+- **Opslag (client)**: `localStorage` voor naam van de deelnemer (`rz_user`)
+- **Backend (optioneel)**: dependency-vrije Node-server in `server/`, JSON-opslag op een Railway-volume.
 
 ## Design
 
@@ -135,3 +137,34 @@ Elke rol heeft een SVG-illustratie inline in de `ROLES`-object.
 - **Nieuwe deelnemers toevoegen**: voeg een object toe aan de `PEOPLE`-array.
 - **Tijden aanpassen**: zoek op `30 min brainstorm` en `10 min plenair` in de HTML.
 - **Fasevergrendeling**: er is eerder een versie gemaakt waarbij fases niet terug te navigeren waren. Die is teruggedraaid op verzoek. De logica is beschikbaar als dat alsnog gewenst is.
+
+## Backend & live-modus (`server/`)
+
+Optionele, **dependency-vrije** Node-server (alleen ingebouwde modules) die op één origin draait en zowel de gebouwde front-end (`dist/`), de console voor Bas (`/admin`) als de JSON-API (`/api`) serveert. Bedoeld voor goedkope hosting op Railway. Zie `server/README.md` voor deploy- en beveiligingsdetails.
+
+**Wat de backend stuurt:**
+
+- **Actieve fase** centraal (`stage`: `home` / `fase1` / `voting` / `fase2` / `fase3` / `done`). Deelnemers kiezen niet meer zelf hun fase; de front-end toont automatisch de actieve fase.
+- **Starttijd + duur per onderdeel** → de front-end toont een live countdown en "terug om HH:MM".
+- **Opbrengsten fase 1** die Bas live meeschrijft.
+- **Dotvoten** tussen fase 1 en 2: elke deelnemer kiest max. N opbrengsten (1 stembiljet per naam, serverseits afgedwongen); top 9 gaat door, uitslag wordt door Bas vrijgegeven.
+
+**Twee modi (front-end):**
+
+- **Standalone** (geen `VITE_LIVE`): exact het oude gedrag — handmatige tabs Home/Spelregels/Fase 1-3. Zo draaien ook de Vitest-tests en de GitHub Pages-build.
+- **Live** (`VITE_LIVE=true`, gezet door het Railway build-commando in `railway.json`): backend-gestuurd. Bottom-nav = Home / Spelregels / **Nu**; "Nu" toont de actieve fase. Bij geen verbinding blijft de laatst bekende state staan.
+
+**Belangrijke bestanden:**
+
+| Pad | Wat |
+|---|---|
+| `server/index.js` | HTTP-server, routing, security headers, rate limiting, static serving |
+| `server/state.js` | Persistente JSON-state (op `DATA_DIR`, default `./data`) + mutaties |
+| `server/participants.js` | Bekende deelnemersnamen (sync houden met `src/data/people.ts`) |
+| `server/public/admin.{html,js}` | Console voor Bas |
+| `src/session/` | API-client, types, timer-context (front-end live-modus) |
+| `src/hooks/useSession.ts` | Polling van `/api/state` + stem-actie |
+| `src/components/LiveApp.tsx` | Live-modus shell + fase-routing |
+| `src/components/tabs/VotingTab.tsx` | Dotvoten-UI |
+
+**Secrets:** alleen `ADMIN_PASSWORD` (env / Railway-variable). `.env` en `data/` staan in `.gitignore` — nooit committen.

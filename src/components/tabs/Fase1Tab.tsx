@@ -25,7 +25,7 @@ export function Fase1Tab({ user }: { user: Person }) {
         title="Samen dromen over Regio Zuid in 2030"
         sub="Verken samen de meest ambitieuze toekomst"
       />
-      <TimeBar />
+      <TimeBar phase="fase1" />
       <GroupCard group={user.f1} />
       <Card>
         <CardLabel>In jouw groep</CardLabel>

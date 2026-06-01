@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Aurora } from './components/Aurora';
 import { BottomNav } from './components/BottomNav';
 import { Header } from './components/Header';
+import LiveApp from './components/LiveApp';
 import { NamePicker } from './components/NamePicker';
 import { Fase1Tab } from './components/tabs/Fase1Tab';
 import { Fase2Tab } from './components/tabs/Fase2Tab';
@@ -10,6 +11,7 @@ import { HomeTab } from './components/tabs/HomeTab';
 import { SpelregelsTab } from './components/tabs/SpelregelsTab';
 import type { Person, TabId } from './data/types';
 import { useStoredUser } from './hooks/useStoredUser';
+import { LIVE_MODE } from './session/types';
 
 function CurrentTab({
   tab,
@@ -35,6 +37,14 @@ function CurrentTab({
 }
 
 export default function App() {
+  // In live mode the active phase, timers and dotvoting are driven by the
+  // backend. Without a backend the app runs standalone (manual tabs), which is
+  // also how the test suite exercises it.
+  if (LIVE_MODE) return <LiveApp />;
+  return <StandaloneApp />;
+}
+
+function StandaloneApp() {
   const { user, setUser, clearUser } = useStoredUser();
   const [tab, setTab] = useState<TabId>('home');
 
@@ -58,7 +68,7 @@ export default function App() {
           >
             <CurrentTab tab={tab} user={user} onNavigate={setTab} />
           </main>
-          <BottomNav active={tab} onSelect={setTab} />
+          <BottomNav active={tab} onSelect={(id) => setTab(id as TabId)} />
         </div>
       )}
     </>

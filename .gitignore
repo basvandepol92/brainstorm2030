@@ -5,3 +5,10 @@ coverage
 .DS_Store
 .vite
 *.tsbuildinfo
+
+# Secrets — never commit these
+.env
+
+# Runtime session data (JSON state file / Railway volume)
+data
+server/data

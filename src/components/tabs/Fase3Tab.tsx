@@ -24,7 +24,7 @@ export function Fase3Tab({ user }: { user: Person }) {
         title="Van dromen naar concrete acties in H2"
         sub="Maak het tastbaar en actiegericht"
       />
-      <TimeBar />
+      <TimeBar phase="fase3" />
       <GroupCard group={user.f3} />
       <Card>
         <CardLabel>In jouw groep</CardLabel>

@@ -33,6 +33,9 @@ jobs:
       - name: Unit tests
         run: npm run test:coverage
 
+      - name: Backend tests
+        run: npm run test:server
+
       - name: Build
         # Served from the root of the custom domain (brainstorm2030.nl),
         # so the default base path "/" is correct. For a project site at

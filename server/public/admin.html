@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Brainstorm 2030 · Bas</title>
+    <style>
+      :root {
+        --bg: #070708;
+        --surface: #101012;
+        --card: rgba(255, 255, 255, 0.04);
+        --line: rgba(255, 255, 255, 0.1);
+        --brand: #f7c948;
+        --ink: #f6f6f4;
+        --dim: #8c8c88;
+        --villain: #ff453a;
+        --sidekick: #2f9eff;
+        --ok: #34d399;
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+        line-height: 1.45;
+      }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
+      h1 { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; margin: 6px 0 2px; }
+      h1 span { color: var(--brand); }
+      .muted { color: var(--dim); font-size: 13px; }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 16px;
+        margin-top: 14px;
+      }
+      .label {
+        font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+        text-transform: uppercase; color: var(--dim); margin-bottom: 10px;
+      }
+      button {
+        font: inherit; font-weight: 700; cursor: pointer;
+        border-radius: 12px; border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.05); color: var(--ink);
+        padding: 10px 14px; transition: transform 0.12s ease;
+      }
+      button:active { transform: scale(0.97); }
+      button.primary { background: var(--brand); color: #000; border-color: transparent; }
+      button.danger { color: var(--villain); border-color: rgba(255, 69, 58, 0.35); }
+      button.ghost { background: transparent; }
+      .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+      .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .stage-btn { text-align: center; padding: 12px 6px; }
+      .stage-btn.active {
+        background: var(--brand); color: #000; border-color: transparent;
+        box-shadow: 0 6px 18px -8px rgba(247, 201, 72, 0.9);
+      }
+      input[type='text'], input[type='number'], input[type='password'], input[type='time'] {
+        font: inherit; color: var(--ink);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+      }
+      input[type='text'] { width: 100%; }
+      .timer-grid { display: grid; gap: 10px; }
+      .timer-row {
+        display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center;
+        padding: 10px; border: 1px solid var(--line); border-radius: 12px;
+      }
+      .timer-row .name { font-weight: 800; }
+      .timer-row .meta { font-size: 12px; color: var(--dim); }
+      .outcome {
+        display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
+        padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px;
+      }
+      .outcome .txt { font-weight: 600; }
+      .outcome .bar { height: 6px; border-radius: 4px; background: var(--brand); margin-top: 6px; }
+      .pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 12px; font-weight: 700; padding: 4px 10px;
+        border-radius: 999px; border: 1px solid var(--line);
+      }
+      .pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+      .on { color: var(--ok); } .on .dot { background: var(--ok); }
+      .off { color: var(--dim); } .off .dot { background: var(--dim); }
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
+      .chip {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 12px; font-weight: 700; padding: 5px 10px;
+        border-radius: 999px; border: 1px solid var(--line);
+      }
+      .chip .dot { width: 7px; height: 7px; border-radius: 50%; }
+      .chip.voted {
+        color: var(--ok); border-color: rgba(52, 211, 153, 0.35);
+        background: rgba(52, 211, 153, 0.08);
+      }
+      .chip.voted .dot { background: var(--ok); }
+      .chip.pending { color: var(--dim); }
+      .chip.pending .dot { background: var(--muted); }
+      #login { max-width: 360px; margin: 60px auto; }
+      .err { color: var(--villain); font-size: 13px; min-height: 18px; margin-top: 8px; }
+      .hidden { display: none; }
+      a.back { color: var(--dim); font-size: 13px; text-decoration: none; }
+      .toast {
+        position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+        background: var(--surface); border: 1px solid var(--line);
+        padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 600;
+        opacity: 0; transition: opacity 0.2s ease; pointer-events: none;
+      }
+      .toast.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div id="login" class="card">
+      <h1>Brainstorm <span>2030</span></h1>
+      <p class="muted">Console voor Bas. Voer het wachtwoord in.</p>
+      <div class="row" style="margin-top: 12px">
+        <input id="pw" type="password" placeholder="Wachtwoord" autocomplete="current-password" style="flex: 1" />
+        <button id="loginBtn" class="primary">Inloggen</button>
+      </div>
+      <div id="loginErr" class="err"></div>
+    </div>
+
+    <div id="app" class="wrap hidden">
+      <div class="row" style="justify-content: space-between">
+        <div>
+          <h1>Bas <span>console</span></h1>
+          <p class="muted" id="status">Verbinden…</p>
+        </div>
+        <button id="logout" class="ghost">Uitloggen</button>
+      </div>
+
+      <div class="card">
+        <div class="label">Actieve fase (wat deelnemers zien)</div>
+        <div class="stages" id="stages"></div>
+      </div>
+
+      <div class="card">
+        <div class="label">Starttijden &amp; terugkomtijd per onderdeel</div>
+        <div class="timer-grid" id="timers"></div>
+      </div>
+
+      <div class="card">
+        <div class="label">Opbrengsten fase 1 (meeschrijven)</div>
+        <div class="row" style="margin-bottom: 10px">
+          <input id="newOutcome" type="text" placeholder="Nieuwe opbrengst…" />
+        </div>
+        <div class="row" style="margin-bottom: 12px">
+          <button id="addOutcome" class="primary">Toevoegen</button>
+        </div>
+        <div id="outcomes"></div>
+      </div>
+
+      <div class="card">
+        <div class="label">Dotvoten</div>
+        <div class="row" style="justify-content: space-between; margin-bottom: 12px">
+          <span id="votingPill" class="pill off"><span class="dot"></span>Stemmen dicht</span>
+          <span class="muted" id="votesCast"></span>
+        </div>
+        <div class="row" style="margin-bottom: 12px">
+          <label class="muted">Stippen p.p.</label>
+          <input id="dots" type="number" min="1" max="20" style="width: 72px" />
+          <button id="saveDots" class="ghost">Opslaan</button>
+        </div>
+        <div class="row" style="margin-bottom: 12px">
+          <button id="toggleVoting" class="primary">Stemmen openen</button>
+          <button id="toggleResults" class="ghost">Uitslag tonen</button>
+          <button id="resetVotes" class="danger">Stemmen wissen</button>
+        </div>
+        <div id="voters"></div>
+        <div id="tally" style="margin-top: 14px"></div>
+      </div>
+
+      <p style="margin-top: 18px"><a class="back" href="/">← Naar de deelnemers-app</a></p>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script src="/admin/admin.js"></script>
+  </body>
+</html>
