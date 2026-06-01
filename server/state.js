@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { PARTICIPANTS } from './participants.js';
 
 /**
  * Persistent session state, stored as a single JSON file. On Railway this file
@@ -212,5 +213,14 @@ export function publicState(name) {
 
 /** Full view for the admin console. */
 export function adminState() {
-  return { ...state, tallies: tallies(), votesCast: votesCast() };
+  const voted = PARTICIPANTS.filter((name) => (state.votes[name] ?? []).length > 0);
+  const pending = PARTICIPANTS.filter((name) => (state.votes[name] ?? []).length === 0);
+  return {
+    ...state,
+    tallies: tallies(),
+    votesCast: votesCast(),
+    participants: PARTICIPANTS,
+    voted,
+    pending,
+  };
 }

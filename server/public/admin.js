@@ -168,6 +168,20 @@ function render() {
   $('toggleVoting').textContent = open ? 'Stemmen sluiten' : 'Stemmen openen';
   $('toggleResults').textContent = state.voting.resultsRevealed ? 'Uitslag verbergen' : 'Uitslag tonen';
   if (document.activeElement !== $('dots')) $('dots').value = state.voting.dotsPerVoter;
+
+  // Wie heeft al wel/niet gestemd
+  const voted = state.voted || [];
+  const pending = state.pending || [];
+  const total = (state.participants || []).length;
+  const chips = (names, cls) =>
+    names.map((n) => `<span class="chip ${cls}"><span class="dot"></span>${escapeHtml(n)}</span>`).join('');
+  $('voters').innerHTML =
+    `<div class="label" style="margin-top:6px">Gestemd · ${voted.length}/${total}</div>` +
+    `<div class="chips">${chips(voted, 'voted') || '<span class="muted" style="font-size:12px">Nog niemand</span>'}</div>` +
+    `<div class="label" style="margin-top:12px">Nog niet</div>` +
+    `<div class="chips">${
+      chips(pending, 'pending') || '<span class="muted" style="font-size:12px">Iedereen heeft gestemd 🎉</span>'
+    }</div>`;
 }
 
 function escapeHtml(s) {

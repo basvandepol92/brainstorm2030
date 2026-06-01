@@ -85,6 +85,20 @@
       .pill .dot { width: 8px; height: 8px; border-radius: 50%; }
       .on { color: var(--ok); } .on .dot { background: var(--ok); }
       .off { color: var(--dim); } .off .dot { background: var(--dim); }
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
+      .chip {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 12px; font-weight: 700; padding: 5px 10px;
+        border-radius: 999px; border: 1px solid var(--line);
+      }
+      .chip .dot { width: 7px; height: 7px; border-radius: 50%; }
+      .chip.voted {
+        color: var(--ok); border-color: rgba(52, 211, 153, 0.35);
+        background: rgba(52, 211, 153, 0.08);
+      }
+      .chip.voted .dot { background: var(--ok); }
+      .chip.pending { color: var(--dim); }
+      .chip.pending .dot { background: var(--muted); }
       #login { max-width: 360px; margin: 60px auto; }
       .err { color: var(--villain); font-size: 13px; min-height: 18px; margin-top: 8px; }
       .hidden { display: none; }
@@ -155,7 +169,8 @@
           <button id="toggleResults" class="ghost">Uitslag tonen</button>
           <button id="resetVotes" class="danger">Stemmen wissen</button>
         </div>
-        <div id="tally"></div>
+        <div id="voters"></div>
+        <div id="tally" style="margin-top: 14px"></div>
       </div>
 
       <p style="margin-top: 18px"><a class="back" href="/">← Naar de deelnemers-app</a></p>
