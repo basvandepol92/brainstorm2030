@@ -37,10 +37,14 @@ jobs:
         run: npm run test:server
 
       - name: Build
-        # Served from the root of the custom domain (brainstorm2030.nl),
-        # so the default base path "/" is correct. For a project site at
-        # https://<owner>.github.io/<repo>/ set VITE_BASE: /<repo>/ instead.
+        # GitHub Pages serves this project site at the subpath
+        # https://basvandepol92.github.io/brainstorm2030/, so the asset base
+        # must match. This build is STANDALONE (no VITE_LIVE) — the live
+        # backend-driven build runs separately on Railway (base "/" via
+        # railway.json). That way both deployments coexist.
         run: npm run build
+        env:
+          VITE_BASE: /brainstorm2030/
 
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'
