@@ -45,9 +45,8 @@ export const STANDARD_NAV: NavItem[] = [
   { id: 'fase3', label: 'Fase 3', icon: ICONS.fase3 },
 ];
 
-/** Live mode: the phase is driven by the backend, so there is one "Nu" tab. */
+/** Live mode: the phase is driven by the backend, so "Nu" leads, then Spelregels. */
 export const LIVE_NAV: NavItem[] = [
-  { id: 'home', label: 'Home', icon: ICONS.home },
-  { id: 'spelregels', label: 'Spelregels', icon: ICONS.spelregels },
   { id: 'nu', label: 'Nu', icon: ICONS.nu },
+  { id: 'spelregels', label: 'Spelregels', icon: ICONS.spelregels },
 ];

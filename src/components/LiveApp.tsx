@@ -14,11 +14,10 @@ import { PageHeader, SectionLabel, TimeBar } from './ui';
 import { Fase1Tab } from './tabs/Fase1Tab';
 import { Fase2Tab } from './tabs/Fase2Tab';
 import { Fase3Tab } from './tabs/Fase3Tab';
-import { HomeTab } from './tabs/HomeTab';
 import { SpelregelsTab } from './tabs/SpelregelsTab';
 import { VotingTab } from './tabs/VotingTab';
 
-type LiveTab = 'home' | 'spelregels' | 'nu';
+type LiveTab = 'spelregels' | 'nu';
 
 export default function LiveApp() {
   const { user, setUser, clearUser } = useStoredUser();
@@ -53,7 +52,6 @@ export default function LiveApp() {
           </div>
         )}
         <main key={tab} className="animate-fade-up flex-1 overflow-y-auto px-5 pt-5 pb-[140px]">
-          {tab === 'home' && <HomeTab user={user} onNavigate={() => setTab('nu')} />}
           {tab === 'spelregels' && <SpelregelsTab />}
           {tab === 'nu' && <LiveStageView user={user} state={state} status={status} vote={vote} />}
         </main>
@@ -109,10 +107,7 @@ function LiveStageView({
       return <Fase3Tab user={user} />;
     case 'done':
       return (
-        <Waiting
-          title="Bedankt! 🎉"
-          sub="De brainstorm zit erop. Bekijk gerust nog je indeling via de Home-tab."
-        />
+        <Waiting title="Bedankt! 🎉" sub="De brainstorm zit erop. Bedankt voor je inzet!" />
       );
     case 'home':
     default:
