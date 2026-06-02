@@ -5,15 +5,17 @@ const TOP_N = 9;
 const STAGES = [
   { id: 'home', label: 'Home / lobby' },
   { id: 'fase1', label: 'Fase 1' },
-  { id: 'voting', label: 'Dotvoten' },
+  { id: 'voting', label: 'Pauze · Dotvoten' },
   { id: 'fase2', label: 'Fase 2' },
+  { id: 'pauze2', label: 'Pauze · Chill' },
   { id: 'fase3', label: 'Fase 3' },
   { id: 'done', label: 'Afgerond' },
 ];
 const PHASES = [
   { id: 'fase1', label: 'Fase 1' },
-  { id: 'voting', label: 'Dotvoten' },
+  { id: 'voting', label: 'Pauze · Dotvoten' },
   { id: 'fase2', label: 'Fase 2' },
+  { id: 'pauze2', label: 'Pauze · Chill' },
   { id: 'fase3', label: 'Fase 3' },
 ];
 

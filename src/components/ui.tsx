@@ -41,6 +41,45 @@ export function CardLabel({ children }: { children: ReactNode }) {
   );
 }
 
+/** Per-fase uitleg: hoe de ronde werkt en wat je aan het eind oplevert. */
+export function Briefing({
+  werkwijze,
+  oplevering,
+}: {
+  werkwijze: string[];
+  oplevering: string[];
+}) {
+  return (
+    <>
+      <SectionLabel>Deze ronde werkt als volgt</SectionLabel>
+      <Card>
+        <div className="flex flex-col gap-3">
+          {werkwijze.map((p, i) => (
+            <p key={i} className="text-[14px] leading-[1.7] text-ink/80">
+              {p}
+            </p>
+          ))}
+        </div>
+      </Card>
+
+      <SectionLabel>Na deze fase presenteer je als groepje</SectionLabel>
+      <div className="glass relative overflow-hidden rounded-card p-5">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-amber to-brand"
+        />
+        <div className="flex flex-col gap-3 pl-2">
+          {oplevering.map((p, i) => (
+            <p key={i} className="text-[14px] leading-[1.7] text-ink/85">
+              {p}
+            </p>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 const ClockIcon = (
   <svg
     className="size-[22px]"

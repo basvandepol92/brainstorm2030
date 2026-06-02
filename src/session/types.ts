@@ -1,7 +1,7 @@
 // Shared types for the live/controlled session driven by the backend.
 
-export type LiveStage = 'home' | 'fase1' | 'voting' | 'fase2' | 'fase3' | 'done';
-export type LivePhase = 'fase1' | 'voting' | 'fase2' | 'fase3';
+export type LiveStage = 'home' | 'fase1' | 'voting' | 'fase2' | 'pauze2' | 'fase3' | 'done';
+export type LivePhase = 'fase1' | 'voting' | 'fase2' | 'pauze2' | 'fase3';
 
 export interface Timer {
   startTime: string | null;

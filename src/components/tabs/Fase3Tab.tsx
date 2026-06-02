@@ -1,8 +1,9 @@
-import { FASE3_INTRO, FASE3_QUESTIONS } from '../../data/content';
+import { FASE3_BRIEFING, FASE3_QUESTIONS } from '../../data/content';
 import { groupMates } from '../../data/selectors';
 import { PEOPLE } from '../../data/people';
 import type { Person } from '../../data/types';
 import {
+  Briefing,
   Card,
   CardLabel,
   Divider,
@@ -32,11 +33,9 @@ export function Fase3Tab({ user }: { user: Person }) {
       </Card>
 
       <Divider />
-      <SectionLabel>Wat wordt er van je gevraagd?</SectionLabel>
-      <Card>
-        <p className="text-[14px] leading-[1.7] text-ink/75">{FASE3_INTRO}</p>
-      </Card>
+      <Briefing werkwijze={FASE3_BRIEFING.werkwijze} oplevering={FASE3_BRIEFING.oplevering} />
 
+      <Divider />
       <SectionLabel>Begeleidende vragen</SectionLabel>
       <Card>
         <QuestionList questions={FASE3_QUESTIONS} />

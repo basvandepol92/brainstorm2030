@@ -1,8 +1,9 @@
-import { FASE1_INTRO, FASE1_THEMES } from '../../data/content';
+import { FASE1_BRIEFING, FASE1_THEMES } from '../../data/content';
 import { groupMates } from '../../data/selectors';
 import { PEOPLE } from '../../data/people';
 import type { Person } from '../../data/types';
 import {
+  Briefing,
   Card,
   CardLabel,
   Collapsible,
@@ -33,11 +34,9 @@ export function Fase1Tab({ user }: { user: Person }) {
       </Card>
 
       <Divider />
-      <SectionLabel>Wat wordt er van je gevraagd?</SectionLabel>
-      <Card>
-        <p className="text-[14px] leading-[1.7] text-ink/75">{FASE1_INTRO}</p>
-      </Card>
+      <Briefing werkwijze={FASE1_BRIEFING.werkwijze} oplevering={FASE1_BRIEFING.oplevering} />
 
+      <Divider />
       <SectionLabel>Begeleidende vragen per thema</SectionLabel>
       <div className="flex flex-col gap-2.5">
         {FASE1_THEMES.map((theme) => (

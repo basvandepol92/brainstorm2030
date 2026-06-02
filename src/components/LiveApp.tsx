@@ -4,12 +4,13 @@ import { useSession } from '../hooks/useSession';
 import { SessionTimingContext } from '../session/SessionContext';
 import type { LiveStage } from '../session/types';
 import type { Person } from '../data/types';
+import { AGENDA } from '../data/content';
 import { Aurora } from './Aurora';
 import { BottomNav } from './BottomNav';
 import { LIVE_NAV } from './navItems';
 import { Header } from './Header';
 import { NamePicker } from './NamePicker';
-import { Card, PageHeader } from './ui';
+import { PageHeader, SectionLabel, TimeBar } from './ui';
 import { Fase1Tab } from './tabs/Fase1Tab';
 import { Fase2Tab } from './tabs/Fase2Tab';
 import { Fase3Tab } from './tabs/Fase3Tab';
@@ -102,6 +103,8 @@ function LiveStageView({
       );
     case 'fase2':
       return <Fase2Tab user={user} />;
+    case 'pauze2':
+      return <PauzeView />;
     case 'fase3':
       return <Fase3Tab user={user} />;
     case 'done':
@@ -125,13 +128,42 @@ function Lobby({ user }: { user: Person }) {
         title={`Hey ${user.name}, we beginnen zo`}
         sub="Je hoeft niets te kiezen — je wordt automatisch meegenomen naar de juiste fase."
       />
-      <Card>
-        <p className="text-[14px] leading-[1.7] text-ink/75">
-          Houd dit scherm bij de hand. Zodra Bas een fase start, verschijnt hier je groep,
-          de opdracht en hoelaat je weer terug moet zijn. Op de Home-tab zie je vast je indeling per
-          fase.
-        </p>
-      </Card>
+      <SectionLabel>Programma van vandaag</SectionLabel>
+      <AgendaList />
+    </>
+  );
+}
+
+function AgendaList() {
+  return (
+    <div className="flex flex-col gap-2">
+      {AGENDA.map((item, i) => (
+        <div key={i} className="glass flex items-center gap-3.5 rounded-[16px] p-3">
+          <div className="flex size-12 flex-shrink-0 flex-col items-center justify-center rounded-xl bg-white/[0.06] ring-1 ring-white/10">
+            <span className="text-[15px] leading-none font-black text-brand">{item.minutes}</span>
+            <span className="text-[9px] font-bold tracking-wide text-dim">MIN</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[14.5px] leading-tight font-bold">{item.label}</div>
+            {item.note && (
+              <div className="mt-0.5 text-[12px] font-semibold text-brand/90">{item.note}</div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PauzeView() {
+  return (
+    <>
+      <PageHeader
+        tag="Pauze"
+        title="Even chillen ☕"
+        sub="Strek de benen en haal wat te drinken. We gaan zo verder met fase 3."
+      />
+      <TimeBar phase="pauze2" />
     </>
   );
 }

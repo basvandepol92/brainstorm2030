@@ -193,4 +193,17 @@ describe('public + admin API', () => {
     });
     assert.equal(res.status, 400);
   });
+
+  test('pauze2 is a selectable stage with its own timer', async () => {
+    const res = await fetch(url('/api/admin/stage'), {
+      method: 'POST',
+      headers: admin,
+      body: JSON.stringify({ stage: 'pauze2' }),
+    });
+    assert.equal(res.status, 200);
+    const s = await (await fetch(url('/api/state'))).json();
+    assert.equal(s.stage, 'pauze2');
+    assert.ok(s.timers.pauze2);
+    assert.equal(s.timers.pauze2.durationMin, 10);
+  });
 });

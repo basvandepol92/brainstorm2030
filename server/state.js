@@ -12,19 +12,21 @@ import { PARTICIPANTS } from './participants.js';
 const DATA_DIR = process.env.DATA_DIR || join(process.cwd(), 'data');
 const FILE = join(DATA_DIR, 'state.json');
 
-export const STAGES = ['home', 'fase1', 'voting', 'fase2', 'fase3', 'done'];
-export const TIMED_PHASES = ['fase1', 'voting', 'fase2', 'fase3'];
+// 'voting' = eerste pauze (dotvoten); 'pauze2' = tweede pauze (even chillen).
+export const STAGES = ['home', 'fase1', 'voting', 'fase2', 'pauze2', 'fase3', 'done'];
+export const TIMED_PHASES = ['fase1', 'voting', 'fase2', 'pauze2', 'fase3'];
 
-const DEFAULT_DURATIONS = { fase1: 30, voting: 10, fase2: 30, fase3: 30 };
+const DEFAULT_DURATIONS = { fase1: 40, voting: 10, fase2: 40, pauze2: 10, fase3: 40 };
 
 function defaultState() {
   return {
     stage: 'home',
     timers: {
-      fase1: { startTime: null, durationMin: 30 },
+      fase1: { startTime: null, durationMin: 40 },
       voting: { startTime: null, durationMin: 10 },
-      fase2: { startTime: null, durationMin: 30 },
-      fase3: { startTime: null, durationMin: 30 },
+      fase2: { startTime: null, durationMin: 40 },
+      pauze2: { startTime: null, durationMin: 10 },
+      fase3: { startTime: null, durationMin: 40 },
     },
     outcomes: [], // { id, text, createdAt }
     voting: { open: false, resultsRevealed: false, dotsPerVoter: 3 },

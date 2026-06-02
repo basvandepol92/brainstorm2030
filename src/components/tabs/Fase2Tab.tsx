@@ -1,8 +1,19 @@
 import { useState } from 'react';
+import { FASE2_BRIEFING } from '../../data/content';
 import { groupMates } from '../../data/selectors';
 import { PEOPLE } from '../../data/people';
 import type { Person } from '../../data/types';
-import { Card, CardLabel, Divider, GroupCard, GroupTiles, PageHeader, SectionLabel, TimeBar } from '../ui';
+import {
+  Briefing,
+  Card,
+  CardLabel,
+  Divider,
+  GroupCard,
+  GroupTiles,
+  PageHeader,
+  SectionLabel,
+  TimeBar,
+} from '../ui';
 import { PokemonCard } from './PokemonCard';
 
 export function Fase2Tab({ user }: { user: Person }) {
@@ -19,6 +30,9 @@ export function Fase2Tab({ user }: { user: Person }) {
       <TimeBar phase="fase2" />
       <GroupCard group={user.f2} />
 
+      <Briefing werkwijze={FASE2_BRIEFING.werkwijze} oplevering={FASE2_BRIEFING.oplevering} />
+
+      <Divider />
       <SectionLabel>Jouw rol</SectionLabel>
       {revealed ? (
         <PokemonCard user={user} />
