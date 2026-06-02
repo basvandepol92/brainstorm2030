@@ -10,5 +10,6 @@ coverage
 .env
 
 # Runtime session data (JSON state file / Railway volume)
-data
-server/data
+# Anchored to the repo root so it never matches src/data/.
+/data
+/server/data
