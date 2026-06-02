@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ROLES } from '../../data/roles';
-import { avatarSlug, ROLE_LABEL } from '../../data/selectors';
+import { avatarSlug, heroName, ROLE_LABEL } from '../../data/selectors';
 import type { Person, Role } from '../../data/types';
 
 /** Card-art extensions tried in order before falling back to the role illustration. */
@@ -84,12 +84,11 @@ export function PokemonCard({ user }: { user: Person }) {
       <div className="rounded-[23px] bg-gradient-to-b from-[#15140f] to-[#0a0a08] p-3.5">
         {/* Title bar */}
         <div className="mb-2.5 flex items-baseline justify-between gap-2 px-0.5">
-          <div className="flex items-baseline gap-2">
-            <span className="text-[19px] font-black tracking-[-0.01em] text-ink">{info.title}</span>
-            <span className="text-[12px] font-semibold text-dim">· {user.name}</span>
-          </div>
+          <span className="min-w-0 text-[19px] leading-tight font-black tracking-[-0.01em] text-ink">
+            {heroName(user.name)}
+          </span>
           <span
-            className={`rounded-full px-2.5 py-0.5 text-[11px] font-black tracking-[0.04em] uppercase ${TYPE_PILL[role]}`}
+            className={`flex-shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-black tracking-[0.04em] uppercase ${TYPE_PILL[role]}`}
           >
             {ROLE_LABEL[role]}
           </span>

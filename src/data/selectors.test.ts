@@ -6,6 +6,8 @@ import {
   findByName,
   groupForPhase,
   groupMates,
+  HERO_NAMES,
+  heroName,
   initials,
   ROLE_LABEL,
   sortedByName,
@@ -95,5 +97,22 @@ describe('ROLE_LABEL', () => {
       villain: 'Villain',
       sidekick: 'Sidekick',
     });
+  });
+});
+
+describe('heroName', () => {
+  it('returns the mapped hero name', () => {
+    expect(heroName('Bas')).toBe('Booster Bas');
+    expect(heroName('Anne-Sophie')).toBe('Amazing Anne-Sophie');
+  });
+
+  it('falls back to the plain name when none is defined', () => {
+    expect(heroName('Nobody')).toBe('Nobody');
+  });
+
+  it('defines a hero name for every participant', () => {
+    for (const p of PEOPLE) {
+      expect(HERO_NAMES[p.name]).toBeTruthy();
+    }
   });
 });

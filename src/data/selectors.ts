@@ -46,3 +46,26 @@ export const ROLE_LABEL: Record<Role, string> = {
   villain: 'Villain',
   sidekick: 'Sidekick',
 };
+
+/** Alliterative "hero name" per participant, matching their Fase 2 role. */
+export const HERO_NAMES: Record<string, string> = {
+  Sven: 'Super Sven',
+  Bram: 'Brave Bram',
+  Elske: 'Epic Elske',
+  'Anne-Sophie': 'Amazing Anne-Sophie',
+  Britt: 'Bad Britt',
+  Richard: 'Ruthless Richard',
+  Ellen: 'Electric Ellen',
+  Bas: 'Booster Bas',
+  Julia: 'Jinx Julia',
+  Jordy: 'Justice Jordy',
+  René: 'Rogue René',
+  Wouter: 'Wingman Wouter',
+  Remco: 'Rocket Remco',
+  Eline: 'Evil Eline',
+};
+
+/** The participant's hero name, or their plain name if none is defined. */
+export function heroName(name: string): string {
+  return HERO_NAMES[name] ?? name;
+}
