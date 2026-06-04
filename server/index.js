@@ -65,23 +65,32 @@ function setSecurityHeaders(res) {
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 }
 
-// ── Rate limiting (fixed window per IP) ──────────────────────────────────────
+// ── Rate limiting (fixed window) ─────────────────────────────────────────────
+// NOTE: the whole room is typically behind one office NAT, so every participant
+// shares a single public IP. Per-IP limits must therefore fit a roomful of
+// devices polling at once — they are a coarse DoS backstop, not a per-user cap.
+// Votes are instead limited per participant NAME so one person can't spam while
+// the rest of the room stays unaffected.
 function makeLimiter(windowMs, max) {
-  const hits = new Map(); // ip -> { count, resetAt }
-  return (ip) => {
+  const hits = new Map(); // key -> { count, resetAt }
+  return (key) => {
     const now = Date.now();
-    let e = hits.get(ip);
+    let e = hits.get(key);
     if (!e || now > e.resetAt) {
       e = { count: 0, resetAt: now + windowMs };
-      hits.set(ip, e);
+      hits.set(key, e);
     }
     e.count += 1;
     if (hits.size > 5000) for (const [k, v] of hits) if (now > v.resetAt) hits.delete(k);
     return e.count <= max;
   };
 }
-const apiLimiter = makeLimiter(60_000, 240); // generous: a room full of pollers
-const writeLimiter = makeLimiter(60_000, 30); // votes + admin writes
+// Per IP: high enough for a NAT'd room (e.g. 30 devices polling every 4s ≈ 450/min).
+const apiLimiter = makeLimiter(60_000, 1200);
+// Per participant name: plenty for re-voting, blocks a single spammer.
+const voteLimiter = makeLimiter(60_000, 40);
+// Per IP: admin (Bas) clicking through outcomes/timers/stages.
+const adminLimiter = makeLimiter(60_000, 240);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function json(res, status, obj) {
@@ -225,9 +234,10 @@ async function routeApi(req, res, url, ip) {
     return json(res, 200, publicState(name));
   }
   if (path === '/api/vote' && method === 'POST') {
-    if (!writeLimiter(ip)) return json(res, 429, { error: 'rate limited' });
     const { name, outcomeIds } = await readBody(req);
     if (!isParticipant(name)) return json(res, 400, { error: 'unknown participant' });
+    // Limit per participant name, not per IP — the room shares one office IP.
+    if (!voteLimiter(name)) return json(res, 429, { error: 'rate limited' });
     try {
       return json(res, 200, { ok: true, myVote: castVote(name, outcomeIds) });
     } catch (err) {
@@ -235,9 +245,9 @@ async function routeApi(req, res, url, ip) {
     }
   }
 
-  // Admin (all writes share the stricter limiter + auth)
+  // Admin (per-IP limiter + auth)
   if (path.startsWith('/api/admin/')) {
-    if (!writeLimiter(ip)) return json(res, 429, { error: 'rate limited' });
+    if (!adminLimiter(ip)) return json(res, 429, { error: 'rate limited' });
     if (!ADMIN_PASSWORD) return json(res, 503, { error: 'admin disabled' });
     if (!isAuthed(req)) return json(res, 401, { error: 'unauthorized' });
     return routeAdmin(req, res, url);
