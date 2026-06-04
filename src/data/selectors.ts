@@ -69,3 +69,24 @@ export const HERO_NAMES: Record<string, string> = {
 export function heroName(name: string): string {
   return HERO_NAMES[name] ?? name;
 }
+
+/** Numeric group from a label like "Groep 2" → 2. Returns 0 if not found. */
+export function groupNumber(group: string): number {
+  const m = group.match(/(\d+)/);
+  return m ? Number(m[1]) : 0;
+}
+
+/**
+ * Distribute a ranked top-list round-robin over 3 groups and return the items
+ * for one group, with their 1-based rank. Groep 1 → ranks 1,4,7; Groep 2 →
+ * 2,5,8; Groep 3 → 3,6,9. Works for any list length (also < 9).
+ */
+export function topForGroup<T>(top: T[], group: string): { rank: number; item: T }[] {
+  const g = groupNumber(group);
+  if (g < 1) return [];
+  const result: { rank: number; item: T }[] = [];
+  for (let i = 0; i < top.length; i++) {
+    if (i % 3 === g - 1) result.push({ rank: i + 1, item: top[i] });
+  }
+  return result;
+}

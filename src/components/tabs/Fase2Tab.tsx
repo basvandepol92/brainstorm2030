@@ -3,6 +3,7 @@ import { FASE2_BRIEFING } from '../../data/content';
 import { groupMates } from '../../data/selectors';
 import { PEOPLE } from '../../data/people';
 import type { Person } from '../../data/types';
+import { AssignedTopics } from '../AssignedTopics';
 import {
   Briefing,
   Card,
@@ -29,6 +30,7 @@ export function Fase2Tab({ user }: { user: Person }) {
       />
       <TimeBar phase="fase2" />
       <GroupCard group={user.f2} />
+      <AssignedTopics group={user.f2} />
 
       <Briefing werkwijze={FASE2_BRIEFING.werkwijze} oplevering={FASE2_BRIEFING.oplevering} />
 

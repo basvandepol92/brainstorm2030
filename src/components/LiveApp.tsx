@@ -4,13 +4,13 @@ import { useSession } from '../hooks/useSession';
 import { SessionTimingContext } from '../session/SessionContext';
 import type { LiveStage } from '../session/types';
 import type { Person } from '../data/types';
-import { AGENDA } from '../data/content';
+import { AGENDA, ONDERLING_BLUNT, ONDERLING_INTRO, ONDERLING_NUANCED } from '../data/content';
 import { Aurora } from './Aurora';
 import { BottomNav } from './BottomNav';
 import { LIVE_NAV } from './navItems';
 import { Header } from './Header';
 import { NamePicker } from './NamePicker';
-import { PageHeader, SectionLabel, TimeBar } from './ui';
+import { Card, PageHeader, SectionLabel, TimeBar } from './ui';
 import { Fase1Tab } from './tabs/Fase1Tab';
 import { Fase2Tab } from './tabs/Fase2Tab';
 import { Fase3Tab } from './tabs/Fase3Tab';
@@ -42,7 +42,9 @@ export default function LiveApp() {
   }
 
   return (
-    <SessionTimingContext.Provider value={{ timers: state?.timers ?? null }}>
+    <SessionTimingContext.Provider
+      value={{ timers: state?.timers ?? null, topOutcomes: state?.topOutcomes ?? null }}
+    >
       <Aurora />
       <div className="relative z-10 mx-auto flex h-full max-w-[480px] flex-col">
         <Header user={user} onChangeUser={clearUser} />
@@ -86,6 +88,8 @@ function LiveStageView({
   }
 
   switch (state.stage) {
+    case 'onderling':
+      return <OnderlingView />;
     case 'fase1':
       return <Fase1Tab user={user} />;
     case 'voting':
@@ -147,6 +151,34 @@ function AgendaList() {
         </div>
       ))}
     </div>
+  );
+}
+
+function OnderlingView() {
+  return (
+    <>
+      <PageHeader
+        tag="Ronde"
+        title="Onderling begrip"
+        sub="Begrijp waar de ander tegenaan loopt in zijn of haar werk"
+      />
+      <TimeBar phase="onderling" />
+      <Card>
+        <p className="text-[14px] leading-[1.7] text-ink/80">{ONDERLING_INTRO}</p>
+      </Card>
+
+      <SectionLabel>De vraag</SectionLabel>
+      <div className="glass relative overflow-hidden rounded-card p-5">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-amber to-brand"
+        />
+        <p className="pl-2 text-[15px] leading-[1.6] font-semibold text-ink">{ONDERLING_NUANCED}</p>
+      </div>
+      <p className="mt-3 px-1 text-[13px] leading-[1.5] text-dim">
+        Of recht voor z'n raap: <span className="font-semibold text-ink/80">{ONDERLING_BLUNT}</span>
+      </p>
+    </>
   );
 }
 

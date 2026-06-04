@@ -2,6 +2,7 @@ import { FASE3_BRIEFING, FASE3_QUESTIONS } from '../../data/content';
 import { groupMates } from '../../data/selectors';
 import { PEOPLE } from '../../data/people';
 import type { Person } from '../../data/types';
+import { AssignedTopics } from '../AssignedTopics';
 import {
   Briefing,
   Card,
@@ -27,6 +28,7 @@ export function Fase3Tab({ user }: { user: Person }) {
       />
       <TimeBar phase="fase3" />
       <GroupCard group={user.f3} />
+      <AssignedTopics group={user.f3} />
       <Card>
         <CardLabel>In jouw groep</CardLabel>
         <GroupTiles people={mates} myName={user.name} />

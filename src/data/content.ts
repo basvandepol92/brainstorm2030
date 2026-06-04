@@ -106,7 +106,7 @@ export interface PhaseBriefing {
 export const FASE1_BRIEFING: PhaseBriefing = {
   werkwijze: [
     'We splitsen de groep op in 3 groepen. Elke groep vormt een droombeeld van regio Zuid in 2030. Hiervoor mag je zelf dromen óf gebruikmaken van de begeleidende vragen die verderop in de app staan — als dat helpt.',
-    "Elke groep eindigt met 1 visie voor 2030 en maximaal 5 droombeelden, waarvan je een keuze maakt van 3 thema's om op in te zetten.",
+    'Elke groep eindigt met 1 visie voor 2030 en maximaal 5 droombeelden.',
   ],
   oplevering: [
     'Jullie gezamenlijke visie voor 2030 en al jullie bedachte droombeelden voor Zuid 2030 op een flipover. Je pitcht dit in maximaal 2 minuten aan de rest van de groep.',
@@ -125,10 +125,19 @@ export const FASE2_BRIEFING: PhaseBriefing = {
 
 export const FASE3_BRIEFING: PhaseBriefing = {
   werkwijze: [
-    "We hebben nu 9 sets thema's behandeld voor het plan 2030. Nu denken we per discipline na over hoe we die grote thema's klein krijgen en wat we in H2 willen beetpakken om daar te komen.",
+    "We hebben nu 3 sets thema's behandeld voor het plan 2030. Je krijgt 1 set toebedeeld als groepje. Nu denken we per discipline na over hoe we die grote thema's klein krijgen en wat we in H2 willen beetpakken om daar te komen.",
     'Beantwoord de vraag: "Denk vanuit je discipline, maar niet alleen vóór je discipline. Welke bijdrage kan jouw discipline leveren aan regio Zuid 2030 in elk thema?" Formuleer maximaal 3 H2-acties en schrijf ze op een flipover. Beschrijf per actie wat we gaan doen en waarom het bijdraagt aan 1 van de 2030-thema\'s. Gebruik desgewenst de begeleidende vragen verderop in de app.',
   ],
   oplevering: [
     'Acties voor de 3 droombeelden van je groep op een flipover. Elk groepje pitcht maximaal 2 minuten.',
   ],
 };
+
+// ── Ronde "Onderling begrip" (vóór fase 1) ───────────────────────────────────
+export const ONDERLING_INTRO =
+  'We starten niet om in de negativiteit te duiken, maar om te begrijpen waar de ander tegenaan loopt in zijn of haar werk. Luister, vraag door en probeer écht te snappen wat het werk van een ander soms lastig maakt.';
+
+export const ONDERLING_BLUNT = 'Wat is het aller k*tste aan je werk?';
+
+export const ONDERLING_NUANCED =
+  'Wat maakt jouw werk soms onnodig moeilijk, en wat zou je willen dat anderen beter begrijpen over jouw rol?';

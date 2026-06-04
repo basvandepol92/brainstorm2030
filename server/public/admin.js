@@ -4,6 +4,7 @@ const TOKEN_KEY = 'rz_admin_token';
 const TOP_N = 9;
 const STAGES = [
   { id: 'home', label: 'Home / lobby' },
+  { id: 'onderling', label: 'Onderling begrip' },
   { id: 'fase1', label: 'Fase 1' },
   { id: 'voting', label: 'Pauze · Dotvoten' },
   { id: 'fase2', label: 'Fase 2' },
@@ -12,6 +13,7 @@ const STAGES = [
   { id: 'done', label: 'Afgerond' },
 ];
 const PHASES = [
+  { id: 'onderling', label: 'Onderling begrip' },
   { id: 'fase1', label: 'Fase 1' },
   { id: 'voting', label: 'Pauze · Dotvoten' },
   { id: 'fase2', label: 'Fase 2' },

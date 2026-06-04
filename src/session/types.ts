@@ -1,7 +1,15 @@
 // Shared types for the live/controlled session driven by the backend.
 
-export type LiveStage = 'home' | 'fase1' | 'voting' | 'fase2' | 'pauze2' | 'fase3' | 'done';
-export type LivePhase = 'fase1' | 'voting' | 'fase2' | 'pauze2' | 'fase3';
+export type LiveStage =
+  | 'home'
+  | 'onderling'
+  | 'fase1'
+  | 'voting'
+  | 'fase2'
+  | 'pauze2'
+  | 'fase3'
+  | 'done';
+export type LivePhase = 'onderling' | 'fase1' | 'voting' | 'fase2' | 'pauze2' | 'fase3';
 
 export interface Timer {
   startTime: string | null;
@@ -27,6 +35,8 @@ export interface SessionState {
   voting: VotingConfig;
   votesCast: number;
   tallies: Record<string, number> | null;
+  /** Top (≤9) droombeelden by votes, highest first. Null until visible. */
+  topOutcomes: Outcome[] | null;
   myVote: string[];
   serverTime: string;
   updatedAt: string;

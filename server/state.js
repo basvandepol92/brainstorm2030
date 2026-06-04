@@ -12,16 +12,18 @@ import { PARTICIPANTS } from './participants.js';
 const DATA_DIR = process.env.DATA_DIR || join(process.cwd(), 'data');
 const FILE = join(DATA_DIR, 'state.json');
 
+// 'onderling' = ronde "Onderling begrip" vóór fase 1;
 // 'voting' = eerste pauze (dotvoten); 'pauze2' = tweede pauze (even chillen).
-export const STAGES = ['home', 'fase1', 'voting', 'fase2', 'pauze2', 'fase3', 'done'];
-export const TIMED_PHASES = ['fase1', 'voting', 'fase2', 'pauze2', 'fase3'];
+export const STAGES = ['home', 'onderling', 'fase1', 'voting', 'fase2', 'pauze2', 'fase3', 'done'];
+export const TIMED_PHASES = ['onderling', 'fase1', 'voting', 'fase2', 'pauze2', 'fase3'];
 
-const DEFAULT_DURATIONS = { fase1: 40, voting: 10, fase2: 40, pauze2: 10, fase3: 40 };
+const DEFAULT_DURATIONS = { onderling: 15, fase1: 40, voting: 10, fase2: 40, pauze2: 10, fase3: 40 };
 
 function defaultState() {
   return {
     stage: 'home',
     timers: {
+      onderling: { startTime: null, durationMin: 15 },
       fase1: { startTime: null, durationMin: 40 },
       voting: { startTime: null, durationMin: 10 },
       fase2: { startTime: null, durationMin: 40 },
@@ -197,9 +199,27 @@ export function votesCast() {
   return Object.values(state.votes).filter((ids) => ids.length > 0).length;
 }
 
+export const TOP_N = 9;
+
+/** The top (max 9) droombeelden by votes, highest first, only those with >0 votes. */
+export function rankedTop() {
+  const counts = tallies();
+  return state.outcomes
+    .map((o) => ({ id: o.id, text: o.text, createdAt: o.createdAt, count: counts[o.id] || 0 }))
+    .filter((o) => o.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, TOP_N)
+    .map(({ id, text, createdAt }) => ({ id, text, createdAt }));
+}
+
+// Stages from fase 2 onward: the top is locked in and shown to the groups even
+// if Bas hasn't explicitly revealed the vote counts.
+const TOP_VISIBLE_STAGES = new Set(['fase2', 'pauze2', 'fase3', 'done']);
+
 /** Public view of the session: no per-name ballots, tallies only when revealed. */
 export function publicState(name) {
   const revealed = state.voting.resultsRevealed;
+  const showTop = revealed || TOP_VISIBLE_STAGES.has(state.stage);
   return {
     stage: state.stage,
     timers: state.timers,
@@ -207,6 +227,7 @@ export function publicState(name) {
     voting: state.voting,
     votesCast: votesCast(),
     tallies: revealed ? tallies() : null,
+    topOutcomes: showTop ? rankedTop() : null,
     myVote: name && state.votes[name] ? state.votes[name] : [],
     serverTime: new Date().toISOString(),
     updatedAt: state.updatedAt,

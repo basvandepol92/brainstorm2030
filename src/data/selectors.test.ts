@@ -6,11 +6,13 @@ import {
   findByName,
   groupForPhase,
   groupMates,
+  groupNumber,
   HERO_NAMES,
   heroName,
   initials,
   ROLE_LABEL,
   sortedByName,
+  topForGroup,
 } from './selectors';
 import type { Person } from './types';
 
@@ -114,5 +116,30 @@ describe('heroName', () => {
     for (const p of PEOPLE) {
       expect(HERO_NAMES[p.name]).toBeTruthy();
     }
+  });
+});
+
+describe('groupNumber & topForGroup', () => {
+  it('parses the group number from a label', () => {
+    expect(groupNumber('Groep 1')).toBe(1);
+    expect(groupNumber('Groep 3')).toBe(3);
+    expect(groupNumber('onbekend')).toBe(0);
+  });
+
+  it('distributes a top of 9 round-robin over three groups', () => {
+    const top = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const ranks = (g: string) => topForGroup(top, g).map((x) => x.rank);
+    expect(ranks('Groep 1')).toEqual([1, 4, 7]);
+    expect(ranks('Groep 2')).toEqual([2, 5, 8]);
+    expect(ranks('Groep 3')).toEqual([3, 6, 9]);
+    // The item lines up with its rank.
+    expect(topForGroup(top, 'Groep 2').map((x) => x.item)).toEqual([2, 5, 8]);
+  });
+
+  it('handles a shorter top (fewer than 9 droombeelden)', () => {
+    const top = ['a', 'b', 'c', 'd', 'e'];
+    expect(topForGroup(top, 'Groep 1').map((x) => x.rank)).toEqual([1, 4]);
+    expect(topForGroup(top, 'Groep 2').map((x) => x.rank)).toEqual([2, 5]);
+    expect(topForGroup(top, 'Groep 3').map((x) => x.rank)).toEqual([3]);
   });
 });

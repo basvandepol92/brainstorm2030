@@ -206,4 +206,27 @@ describe('public + admin API', () => {
     assert.ok(s.timers.pauze2);
     assert.equal(s.timers.pauze2.durationMin, 10);
   });
+
+  test('onderling is a selectable stage with a 15-min timer', async () => {
+    const res = await fetch(url('/api/admin/stage'), {
+      method: 'POST',
+      headers: admin,
+      body: JSON.stringify({ stage: 'onderling' }),
+    });
+    assert.equal(res.status, 200);
+    const s = await (await fetch(url('/api/state'))).json();
+    assert.equal(s.stage, 'onderling');
+    assert.ok(s.timers.onderling);
+    assert.equal(s.timers.onderling.durationMin, 15);
+  });
+
+  test('topOutcomes is exposed once results are revealed, most-voted first', async () => {
+    // results were revealed in the voting-flow test above
+    const s = await (await fetch(url('/api/state'))).json();
+    assert.ok(Array.isArray(s.topOutcomes));
+    assert.ok(s.topOutcomes.length >= 1);
+    const adminS = await (await fetch(url('/api/admin/state'), { headers: admin })).json();
+    const maxId = Object.entries(adminS.tallies).sort((a, b) => b[1] - a[1])[0][0];
+    assert.equal(s.topOutcomes[0].id, maxId);
+  });
 });
