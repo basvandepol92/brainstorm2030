@@ -1,4 +1,5 @@
 export const SPELREGELS: string[] = [
+  'Laat bij elke brainstormfase 1 iemand CoPilot aanzetten om te notuleren tijdens deze fase. Dit helpt je aan het einde van de fase om je opbrengsten sneller bij elkaar te krijgen.',
   'Elk idee is welkom — oordeel pas later. Kwantiteit boven kwaliteit in de divergerende fase.',
   'Bouw voort op ideeën van anderen. Zeg "ja, en…" in plaats van "ja, maar…"',
   'Eén gesprek tegelijk. Laat elkaar uitpraten — geen interrupties.',
